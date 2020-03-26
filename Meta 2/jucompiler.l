@@ -4,6 +4,7 @@
         Tiago Fernandes - 2017242428;
     */  
     #include <string.h>
+    #include <y.tab.h>
     int imprime = 0;
     int erros = 0;
     int num_linhas = 1;
@@ -48,48 +49,48 @@ WHITESPACE      \f|\t|" "
 {REALLIT}               {if(imprime==1){printf("REALLIT(%s)\n", yytext);} num_colunas += yyleng;}
 {NEWLINE}               {num_linhas++;num_colunas = 1;}
 {BOOLLIT}               {if(imprime==1){printf("BOOLLIT(%s)\n", yytext);} num_colunas += yyleng;}
-"&&"                    {if(imprime==1){printf("AND\n");} num_colunas += yyleng;}
-"="                     {if(imprime==1){printf("ASSIGN\n");}num_colunas += yyleng;}
-"*"                     {if(imprime==1){printf("STAR\n");}num_colunas += yyleng;}
-","    	                {if(imprime==1){printf("COMMA\n");}num_colunas += yyleng;}
-"/"                     {if(imprime==1){printf("DIV\n");}num_colunas += yyleng;}
-"=="                    {if(imprime==1){printf("EQ\n");}num_colunas += yyleng;}
-">="                    {if(imprime==1){printf("GE\n");}num_colunas += yyleng;}
-">"                     {if(imprime==1){printf("GT\n");}num_colunas += yyleng;}
-"if"                    {if(imprime==1){printf("IF\n");}num_colunas += yyleng;}
-"{"                     {if(imprime==1){printf("LBRACE\n");}num_colunas += yyleng;}
-"<="                    {if(imprime==1){printf("LE\n");}num_colunas += yyleng;}
-"("                     {if(imprime==1){printf("LPAR\n");}num_colunas += yyleng;}
-"["                     {if(imprime==1){printf("LSQ\n");}num_colunas += yyleng;}
-"<"                     {if(imprime==1){printf("LT\n");}num_colunas += yyleng;}
-"-"                     {if(imprime==1){printf("MINUS\n");}num_colunas += yyleng;}
-"%"                     {if(imprime==1){printf("MOD\n");}num_colunas += yyleng;}
-"!="                    {if(imprime==1){printf("NE\n");}num_colunas += yyleng;}
-"!"                     {if(imprime==1){printf("NOT\n");}num_colunas += yyleng;}
-"||"                    {if(imprime==1){printf("OR\n");}num_colunas += yyleng;}
-"+"                     {if(imprime==1){printf("PLUS\n");}num_colunas += yyleng;}
-"}"                     {if(imprime==1){printf("RBRACE\n");}num_colunas += yyleng;}
-")"                     {if(imprime==1){printf("RPAR\n");}num_colunas += yyleng;}
-"]"                     {if(imprime==1){printf("RSQ\n");}num_colunas += yyleng;}
-";"                     {if(imprime==1){printf("SEMICOLON\n");}num_colunas += yyleng;}
-"->"                    {if(imprime==1){printf("ARROW\n");}num_colunas += yyleng;}
-"<<"                    {if(imprime==1){printf("LSHIFT\n");}num_colunas += yyleng;}
-">>"                    {if(imprime==1){printf("RSHIFT\n");}num_colunas += yyleng;}
-"^"                     {if(imprime==1){printf("XOR\n");}num_colunas += yyleng;}
-"boolean"               {if(imprime==1){printf("BOOL\n");}num_colunas += yyleng;}
-"class"                 {if(imprime==1){printf("CLASS\n");}num_colunas += yyleng;}
-".length"               {if(imprime==1){printf("DOTLENGTH\n");}num_colunas += yyleng;}
-"double"                {if(imprime==1){printf("DOUBLE\n");}num_colunas += yyleng;}
-"else"                  {if(imprime==1){printf("ELSE\n");}num_colunas += yyleng;}
-"int"                   {if(imprime==1){printf("INT\n");}num_colunas += yyleng;}
-"System.out.print"      {if(imprime==1){printf("PRINT\n");}num_colunas += yyleng;}
-"Integer.parseInt"      {if(imprime==1){printf("PARSEINT\n");}num_colunas += yyleng;}
-"public"                {if(imprime==1){printf("PUBLIC\n");}num_colunas += yyleng;}
-"return"                {if(imprime==1){printf("RETURN\n");}num_colunas += yyleng;}
-"static"                {if(imprime==1){printf("STATIC\n");}num_colunas += yyleng;}
-"String"                {if(imprime==1){printf("STRING\n");}num_colunas += yyleng;}
-"void"                  {if(imprime==1){printf("VOID\n");}num_colunas += yyleng;}
-"while"                 {if(imprime==1){printf("WHILE\n");}num_colunas += yyleng;}
+"&&"                    {if(imprime==1){printf("AND\n");} num_colunas += yyleng; return AND;}
+"="                     {if(imprime==1){printf("ASSIGN\n");}num_colunas += yyleng; return ASSIGN;}
+"*"                     {if(imprime==1){printf("STAR\n");}num_colunas += yyleng; return STAR;}
+","    	                {if(imprime==1){printf("COMMA\n");}num_colunas += yyleng; return COMMA;}
+"/"                     {if(imprime==1){printf("DIV\n");}num_colunas += yyleng; return DIV;}
+"=="                    {if(imprime==1){printf("EQ\n");}num_colunas += yyleng; return EQ;}
+">="                    {if(imprime==1){printf("GE\n");}num_colunas += yyleng; return GE;}
+">"                     {if(imprime==1){printf("GT\n");}num_colunas += yyleng; return GT;}
+"if"                    {if(imprime==1){printf("IF\n");}num_colunas += yyleng; return IF;}
+"{"                     {if(imprime==1){printf("LBRACE\n");}num_colunas += yyleng; return LBRACE;}
+"<="                    {if(imprime==1){printf("LE\n");}num_colunas += yyleng; return LE;}
+"("                     {if(imprime==1){printf("LPAR\n");}num_colunas += yyleng; return LPAR;}
+"["                     {if(imprime==1){printf("LSQ\n");}num_colunas += yyleng; return LSQ;}
+"<"                     {if(imprime==1){printf("LT\n");}num_colunas += yyleng; return LT;}
+"-"                     {if(imprime==1){printf("MINUS\n");}num_colunas += yyleng; return MINUS;}
+"%"                     {if(imprime==1){printf("MOD\n");}num_colunas += yyleng; return MOD;}
+"!="                    {if(imprime==1){printf("NE\n");}num_colunas += yyleng; return NE;}
+"!"                     {if(imprime==1){printf("NOT\n");}num_colunas += yyleng; return NOT;}
+"||"                    {if(imprime==1){printf("OR\n");}num_colunas += yyleng; return OR;}
+"+"                     {if(imprime==1){printf("PLUS\n");}num_colunas += yyleng; return PLUS;}
+"}"                     {if(imprime==1){printf("RBRACE\n");}num_colunas += yyleng; return RBRACE;}
+")"                     {if(imprime==1){printf("RPAR\n");}num_colunas += yyleng; return RPAR;}
+"]"                     {if(imprime==1){printf("RSQ\n");}num_colunas += yyleng; return RSQ;}
+";"                     {if(imprime==1){printf("SEMICOLON\n");}num_colunas += yyleng; return SEMICOLON;}
+"->"                    {if(imprime==1){printf("ARROW\n");}num_colunas += yyleng; return ARROW;}
+"<<"                    {if(imprime==1){printf("LSHIFT\n");}num_colunas += yyleng; return LSHIFT;}
+">>"                    {if(imprime==1){printf("RSHIFT\n");}num_colunas += yyleng; return RSHIFT;}
+"^"                     {if(imprime==1){printf("XOR\n");}num_colunas += yyleng; return XOR;}
+"boolean"               {if(imprime==1){printf("BOOL\n");}num_colunas += yyleng; return BOOL;}
+"class"                 {if(imprime==1){printf("CLASS\n");}num_colunas += yyleng; return CLASS;}
+".length"               {if(imprime==1){printf("DOTLENGTH\n");}num_colunas += yyleng; return DOTLENGTH;}
+"double"                {if(imprime==1){printf("DOUBLE\n");}num_colunas += yyleng; return DOUBLE;}
+"else"                  {if(imprime==1){printf("ELSE\n");}num_colunas += yyleng; return ELSE;}
+"int"                   {if(imprime==1){printf("INT\n");}num_colunas += yyleng; return INT;}
+"System.out.print"      {if(imprime==1){printf("PRINT\n");}num_colunas += yyleng; return PRINT;}
+"Integer.parseInt"      {if(imprime==1){printf("PARSEINT\n");}num_colunas += yyleng; return PARSEINT;}
+"public"                {if(imprime==1){printf("PUBLIC\n");}num_colunas += yyleng; return PUBLIC;}
+"return"                {if(imprime==1){printf("RETURN\n");}num_colunas += yyleng; return RETURN;}
+"static"                {if(imprime==1){printf("STATIC\n");}num_colunas += yyleng; return STATIC;}
+"String"                {if(imprime==1){printf("STRING\n");}num_colunas += yyleng; return STRING;}
+"void"                  {if(imprime==1){printf("VOID\n");}num_colunas += yyleng; return VOID;}
+"while"                 {if(imprime==1){printf("WHILE\n");}num_colunas += yyleng; return WHILE;}
 {WHITESPACE}            {num_colunas += yyleng;}
 {RESERVED}              {if(imprime==1){printf("RESERVED(%s)\n", yytext);} num_colunas += yyleng;}
 {ID}                    {if(imprime==1){printf("ID(%s)\n", yytext);} num_colunas += yyleng;}
