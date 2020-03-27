@@ -49,9 +49,20 @@ node *add_child(node *dad, node *child){
 }
 
 
-void print_tree(node *head, int depth){
-    char *points = "";
+node *add_bro(node * s1, node * s2){
+	struct node *aux = s1;
 
+	if (aux != NULL) {
+		while (aux->bros != NULL) {
+			aux = aux->bros;
+		}
+		aux->bros = s2;
+	}
+	return s1;
+}
+
+
+void print_tree(node *head, int depth){
     if (head == NULL){
         return;
     }
@@ -61,7 +72,7 @@ void print_tree(node *head, int depth){
     }
 
     if (strcmp(head->value, "") == 0){
-        print("%s\n", head->type);
+        printf("%s\n", head->type);
     }
     else{
         printf("%s(%s)\n", head->type, head->value);

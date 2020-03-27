@@ -16,4 +16,5 @@ typedef struct node{
 // Nomes das funcoes usadas abaixos
 node *create_node(char *type, char* value);
 node *add_child(node *dad, node *child);
+node *add_bro(node * s1, node * s2);
 void print_tree(node *head, int depth);

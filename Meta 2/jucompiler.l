@@ -45,10 +45,10 @@ WHITESPACE      \f|\t|" "
 
 %%
 
-{INTLIT}                {if(imprime==1){printf("INTLIT(%s)\n", yytext);} num_colunas += yyleng;}
-{REALLIT}               {if(imprime==1){printf("REALLIT(%s)\n", yytext);} num_colunas += yyleng;}
+{INTLIT}                {if(imprime==1){printf("INTLIT(%s)\n", yytext);} num_colunas += yyleng; yylval.str = (char *) strdup(yytext); return INTLIT;}
+{REALLIT}               {if(imprime==1){printf("REALLIT(%s)\n", yytext);} num_colunas += yyleng; yylval.str = (char *) strdup(yytext); return REALLIT;}
 {NEWLINE}               {num_linhas++;num_colunas = 1;}
-{BOOLLIT}               {if(imprime==1){printf("BOOLLIT(%s)\n", yytext);} num_colunas += yyleng;}
+{BOOLLIT}               {if(imprime==1){printf("BOOLLIT(%s)\n", yytext);} num_colunas += yyleng; yylval.str = (char *) strdup(yytext); return BOOLLIT;}
 "&&"                    {if(imprime==1){printf("AND\n");} num_colunas += yyleng; return AND;}
 "="                     {if(imprime==1){printf("ASSIGN\n");}num_colunas += yyleng; return ASSIGN;}
 "*"                     {if(imprime==1){printf("STAR\n");}num_colunas += yyleng; return STAR;}
@@ -92,8 +92,8 @@ WHITESPACE      \f|\t|" "
 "void"                  {if(imprime==1){printf("VOID\n");}num_colunas += yyleng; return VOID;}
 "while"                 {if(imprime==1){printf("WHILE\n");}num_colunas += yyleng; return WHILE;}
 {WHITESPACE}            {num_colunas += yyleng;}
-{RESERVED}              {if(imprime==1){printf("RESERVED(%s)\n", yytext);} num_colunas += yyleng;}
-{ID}                    {if(imprime==1){printf("ID(%s)\n", yytext);} num_colunas += yyleng;}
+{RESERVED}              {if(imprime==1){printf("RESERVED(%s)\n", yytext);} yylval.str = (char *) strdup(yytext); num_colunas += yyleng; return RESERVED;}
+{ID}                    {if(imprime==1){printf("ID(%s)\n", yytext);} num_colunas += yyleng; yylval.str = (char *) strdup(yytext); return ID;}
 
 
 "//"                        {BEGIN LINECOMMENT;}
@@ -107,7 +107,7 @@ WHITESPACE      \f|\t|" "
 <BLOCKCOMMENT>"*/"      {BEGIN 0; num_colunas += yyleng;}
 
 \"                           {BEGIN STRINGLIT; strcpy(string,"\""); erro = 0; errorcol = num_colunas; errorline=num_linhas; num_colunas += yyleng;}
-<STRINGLIT>\"                {strcat(string, "\""); if(erro == 0){printString(string);BEGIN 0; num_colunas += yyleng;} else {BEGIN 0; num_colunas += yyleng;}}
+<STRINGLIT>\"                {strcat(string, "\""); if(erro == 0){printString(string); BEGIN 0; num_colunas += yyleng; yylval.str = (char *) strdup(string); return STRLIT;} else {BEGIN 0; num_colunas += yyleng;}}
 <STRINGLIT>{NEWLINE}         {if (imprime == 1 || erros == 1){printf("Line %d, col %d: unterminated string literal\n", errorline, errorcol);} num_linhas++; num_colunas = 1; BEGIN 0;}
 <STRINGLIT><<EOF>>           {if (imprime == 1 || erros == 1){printf("Line %d, col %d: unterminated string literal\n", errorline, errorcol);} BEGIN 0;}
 <STRINGLIT>{Invalidesc}      {if (imprime == 1 || erros == 1){printf("Line %d, col %d: invalid escape sequence (%s)\n", errorline, num_colunas, yytext);} num_colunas += yyleng; erro = 1;}

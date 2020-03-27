@@ -45,41 +45,117 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    INTEGER = 258,
-    DOUBLE = 259,
-    CHARACTER = 260,
-    LET = 261,
-    IN = 262,
-    END = 263,
-    WRITE = 264,
-    IDENTIFIER = 265
+    AND = 258,
+    ASSIGN = 259,
+    STAR = 260,
+    COMMA = 261,
+    DIV = 262,
+    EQ = 263,
+    GE = 264,
+    GT = 265,
+    IF = 266,
+    LBRACE = 267,
+    LE = 268,
+    LPAR = 269,
+    LSQ = 270,
+    LT = 271,
+    MINUS = 272,
+    MOD = 273,
+    NE = 274,
+    NOT = 275,
+    OR = 276,
+    PLUS = 277,
+    RBRACE = 278,
+    RPAR = 279,
+    RSQ = 280,
+    SEMICOLON = 281,
+    ARROW = 282,
+    LSHIFT = 283,
+    RSHIFT = 284,
+    XOR = 285,
+    BOOL = 286,
+    CLASS = 287,
+    DOTLENGTH = 288,
+    DOUBLE = 289,
+    ELSE = 290,
+    INT = 291,
+    PRINT = 292,
+    PARSEINT = 293,
+    PUBLIC = 294,
+    RETURN = 295,
+    STATIC = 296,
+    STRING = 297,
+    VOID = 298,
+    WHILE = 299,
+    INTLIT = 300,
+    REALLIT = 301,
+    BOOLLIT = 302,
+    RESERVED = 303,
+    ID = 304,
+    STRLIT = 305
   };
 #endif
 /* Tokens.  */
-#define INTEGER 258
-#define DOUBLE 259
-#define CHARACTER 260
-#define LET 261
-#define IN 262
-#define END 263
-#define WRITE 264
-#define IDENTIFIER 265
+#define AND 258
+#define ASSIGN 259
+#define STAR 260
+#define COMMA 261
+#define DIV 262
+#define EQ 263
+#define GE 264
+#define GT 265
+#define IF 266
+#define LBRACE 267
+#define LE 268
+#define LPAR 269
+#define LSQ 270
+#define LT 271
+#define MINUS 272
+#define MOD 273
+#define NE 274
+#define NOT 275
+#define OR 276
+#define PLUS 277
+#define RBRACE 278
+#define RPAR 279
+#define RSQ 280
+#define SEMICOLON 281
+#define ARROW 282
+#define LSHIFT 283
+#define RSHIFT 284
+#define XOR 285
+#define BOOL 286
+#define CLASS 287
+#define DOTLENGTH 288
+#define DOUBLE 289
+#define ELSE 290
+#define INT 291
+#define PRINT 292
+#define PARSEINT 293
+#define PUBLIC 294
+#define RETURN 295
+#define STATIC 296
+#define STRING 297
+#define VOID 298
+#define WHILE 299
+#define INTLIT 300
+#define REALLIT 301
+#define BOOLLIT 302
+#define RESERVED 303
+#define ID 304
+#define STRLIT 305
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 23 "ficha4.2.y" /* yacc.c:1909  */
+#line 20 "jucompiler.y" /* yacc.c:1909  */
 
-    char *id;
-    is_program* ip;
-    is_vardec_list* ivl;
-    is_vardec* iv;
-    is_statement_list* isl;
-    is_statement* is;
+    char *str;
+    struct node *node;
 
-#line 83 "y.tab.h" /* yacc.c:1909  */
+#line 159 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
