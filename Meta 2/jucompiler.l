@@ -4,11 +4,12 @@
         Tiago Fernandes - 2017242428;
     */  
     #include <string.h>
-    #include <y.tab.h>
-    int imprime = 0;
-    int erros = 0;
+    #include "y.tab.h"
+    int imprime, erros; // Definidas no jucompiler.y
     int num_linhas = 1;
     int num_colunas = 1;
+    int parse_error = 0;
+    extern int error_tag;
     int errorline, errorcol;
     int commentline, commentcol;
     char string[1024] = "";
@@ -45,8 +46,8 @@ WHITESPACE      \f|\t|" "
 
 %%
 
-{INTLIT}                {if(imprime==1){printf("INTLIT(%s)\n", yytext);} num_colunas += yyleng; yylval.str = (char *) strdup(yytext); return INTLIT;}
-{REALLIT}               {if(imprime==1){printf("REALLIT(%s)\n", yytext);} num_colunas += yyleng; yylval.str = (char *) strdup(yytext); return REALLIT;}
+{INTLIT}                {if(imprime==1){printf("INTLIT(%s)\n", yytext);} num_colunas += yyleng; yylval.str = (char *) strdup(yytext); /*return INTLIT;*/}
+{REALLIT}               {if(imprime==1){printf("REALLIT(%s)\n", yytext);} num_colunas += yyleng; yylval.str = (char *) strdup(yytext); /*return REALLIT;*/}
 {NEWLINE}               {num_linhas++;num_colunas = 1;}
 {BOOLLIT}               {if(imprime==1){printf("BOOLLIT(%s)\n", yytext);} num_colunas += yyleng; yylval.str = (char *) strdup(yytext); return BOOLLIT;}
 "&&"                    {if(imprime==1){printf("AND\n");} num_colunas += yyleng; return AND;}
@@ -100,11 +101,11 @@ WHITESPACE      \f|\t|" "
 <LINECOMMENT>{NEWLINE}      {num_linhas++; num_colunas = 1; BEGIN 0;}
 <LINECOMMENT>.              {;}
 
-"/*"                    {BEGIN BLOCKCOMMENT; commentline = num_linhas; commentcol = num_colunas; num_colunas += yyleng;}
-<BLOCKCOMMENT>{NEWLINE} {num_linhas++; num_colunas = 1;}
-<BLOCKCOMMENT><<EOF>>   {if(imprime == 1 || erros == 1){printf("Line %d, col %d: unterminated comment\n", commentline, commentcol);} return 0;}
-<BLOCKCOMMENT>.         {num_colunas += yyleng;}
-<BLOCKCOMMENT>"*/"      {BEGIN 0; num_colunas += yyleng;}
+"/*"                    {parse_error = 0; BEGIN BLOCKCOMMENT; commentline = num_linhas; commentcol = num_colunas; num_colunas += yyleng;}
+<BLOCKCOMMENT>{NEWLINE} {parse_error = 0; num_linhas++; num_colunas = 1;}
+<BLOCKCOMMENT><<EOF>>   {parse_error = 0; if(imprime == 1 || erros == 1){printf("Line %d, col %d: unterminated comment\n", commentline, commentcol); errorline = num_linhas; errorcol = num_colunas; parse_error = 1;} return 0;}
+<BLOCKCOMMENT>.         {parse_error = 0; num_colunas += yyleng;}
+<BLOCKCOMMENT>"*/"      {parse_error = 0; BEGIN 0; num_colunas += yyleng;}
 
 \"                           {BEGIN STRINGLIT; strcpy(string,"\""); erro = 0; errorcol = num_colunas; errorline=num_linhas; num_colunas += yyleng;}
 <STRINGLIT>\"                {strcat(string, "\""); if(erro == 0){printString(string); BEGIN 0; num_colunas += yyleng; yylval.str = (char *) strdup(string); return STRLIT;} else {BEGIN 0; num_colunas += yyleng;}}
@@ -115,7 +116,7 @@ WHITESPACE      \f|\t|" "
 <STRINGLIT>{STRLIT}          {strcat(string, yytext); num_colunas += yyleng;}
 <STRINGLIT>.                 {strcat(string, yytext); num_colunas += yyleng;}
 
-<<EOF>>         {num_colunas += 1; return 0;}
+<<EOF>>         {num_colunas += 1; parse_error = 1; return 0;}
 .               {if(imprime == 1 || erros == 1){printf("Line %d, col %d: illegal character (%s)\n", num_linhas, num_colunas, yytext);} num_colunas += yyleng;}
 
 %%
@@ -128,24 +129,14 @@ void printString(char * string){
     }
 }
 
-int main(int argc, char *argv[]){
-    if (argc > 1){
-        if (strcmp(argv[1], "-l") == 0){
-            imprime = 1;
-            erros = 1;
-        }
-        else if (strcmp(argv[1], "-e1") == 0){
-            erros = 1;
-        }
-        else{
-            return 0;
-        }
+void yyerror(const char *s){
+    error_tag = 1;
+    if (parse_error){
+        printf("Line %d, col %d: %s: %s \n", errorline, errorcol, s, yytext);
     }
-    if (argc == 1){
-        erros = 1;
+    else{
+        printf("Line %d, col %d: %s: %s \n", num_linhas, (int)(num_colunas - strlen(yytext)), s, yytext);
     }
-    yylex();
-    return 0;
 }
 
 int yywrap(){

@@ -1,4 +1,5 @@
 #include "structures.h"
+#include <unistd.h>
 
 /*typedef struct node{
     char* type;
@@ -10,7 +11,7 @@
 }node;*/
 
 
-node *create_node(char *type, char* value){
+struct node *create_node(char *type, char* value){
     node *new = (node *) malloc(sizeof(node));
 
     if (new == NULL){
@@ -24,7 +25,7 @@ node *create_node(char *type, char* value){
     return new;
 }
 
-node *add_child(node *dad, node *child){
+struct node *add_child(node *dad, node *child){
     // Verifica se algum dos nodes fornecidos esta a NULL ou nao
     if (dad == NULL || child == NULL){
         return NULL;
@@ -49,7 +50,7 @@ node *add_child(node *dad, node *child){
 }
 
 
-node *add_bro(node * s1, node * s2){
+struct node *add_bro(node * s1, node * s2){
 	struct node *aux = s1;
 
 	if (aux != NULL) {
@@ -62,7 +63,7 @@ node *add_bro(node * s1, node * s2){
 }
 
 
-void print_tree(node *head, int depth){
+/*void print_tree(node *head, int depth){
     if (head == NULL){
         return;
     }
@@ -83,4 +84,4 @@ void print_tree(node *head, int depth){
     }
 
     free(head);
-}
+}*/
