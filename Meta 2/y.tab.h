@@ -87,13 +87,12 @@ extern int yydebug;
     STRING = 297,
     VOID = 298,
     WHILE = 299,
-    UN = 300,
-    INTLIT = 301,
-    REALLIT = 302,
-    BOOLLIT = 303,
-    RESERVED = 304,
-    ID = 305,
-    STRLIT = 306
+    INTLIT = 300,
+    REALLIT = 301,
+    BOOLLIT = 302,
+    RESERVED = 303,
+    ID = 304,
+    STRLIT = 305
   };
 #endif
 /* Tokens.  */
@@ -139,13 +138,12 @@ extern int yydebug;
 #define STRING 297
 #define VOID 298
 #define WHILE 299
-#define UN 300
-#define INTLIT 301
-#define REALLIT 302
-#define BOOLLIT 303
-#define RESERVED 304
-#define ID 305
-#define STRLIT 306
+#define INTLIT 300
+#define REALLIT 301
+#define BOOLLIT 302
+#define RESERVED 303
+#define ID 304
+#define STRLIT 305
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -157,7 +155,7 @@ union YYSTYPE
     char *str;
     struct node *node;
 
-#line 161 "y.tab.h" /* yacc.c:1909  */
+#line 159 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

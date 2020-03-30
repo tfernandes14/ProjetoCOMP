@@ -11,7 +11,7 @@
     int parse_error = 0;
     extern int error_tag;
     int errorline = 1, errorcol = 1;    // Erros nas STRLIT e BLOCKCOMMENT
-    int commentline, commentcol;
+    int commentline, commentcol;        // Erros nas STRLIT e BLOCKCOMMENT
     char string[1024] = "";
     void printString(char * string);
     int erro = 0;
@@ -24,6 +24,7 @@
 %X BLOCKCOMMENT
 %X STRINGLIT
 %X TERMINATOR
+%X AUX_STATE
 
 sinais          [+|-]
 letras          [A-Za-z_$]
@@ -51,8 +52,10 @@ WHITESPACE      \f|\t|" "
                                 printf("INTLIT(%s)\n", yytext);
                             }
                             num_colunas += yyleng;
+                            BEGIN AUX_STATE;
                             yylval.str = (char *) strdup(yytext);
                             if(return_flag == 1){
+                                //printf("INTLIT\n");
                                 return INTLIT;
                             }
                         }
@@ -62,8 +65,10 @@ WHITESPACE      \f|\t|" "
                                 printf("REALLIT(%s)\n", yytext);
                             }
                             num_colunas += yyleng;
+                            BEGIN AUX_STATE;
                             yylval.str = (char *) strdup(yytext);
                             if(return_flag == 1){
+                                //printf("REALLIT\n");
                                 return REALLIT;
                             }
                         }
@@ -80,6 +85,7 @@ WHITESPACE      \f|\t|" "
                             num_colunas += yyleng;
                             yylval.str = (char *) strdup(yytext);
                             if(return_flag == 1){
+                                //printf("BOOLLIT\n");
                                 return BOOLLIT;
                             }
                         }
@@ -90,6 +96,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("AND\n");
                                 return AND;
                             }
                         }
@@ -100,6 +107,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("ASSIGN\n");
                                 return ASSIGN;
                             }
                         }
@@ -110,6 +118,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("STAR\n");
                                 return STAR;
                             }
                         }
@@ -120,6 +129,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("COMMA\n");
                                 return COMMA;
                             }
                         }
@@ -130,6 +140,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("DIV\n");
                                 return DIV;
                             }
                         }
@@ -140,6 +151,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("EQ\n");
                                 return EQ;
                             }
                         }
@@ -150,6 +162,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("GE\n");
                                 return GE;
                             }
                         }
@@ -160,6 +173,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("GT\n");
                                 return GT;
                             }
                         }
@@ -170,6 +184,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("IF\n");
                                 return IF;
                             }
                         }
@@ -180,6 +195,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("LBRACE\n");
                                 return LBRACE;
                             }
                         }
@@ -190,6 +206,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("LE\n");
                                 return LE;
                             }
                         }
@@ -200,6 +217,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("LPAR\n");
                                 return LPAR;
                             }
                         }
@@ -210,6 +228,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("LSQ\n");
                                 return LSQ;
                             }
                         }
@@ -220,6 +239,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("LT\n");
                                 return LT;
                             }
                         }
@@ -230,6 +250,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("MINUS\n");
                                 return MINUS;
                             }
                         }
@@ -240,6 +261,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("MOD\n");
                                 return MOD;
                             }
                         }
@@ -250,6 +272,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("NE\n");
                                 return NE;
                             }
                         }
@@ -260,6 +283,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("NOT\n");
                                 return NOT;
                             }
                         }
@@ -270,6 +294,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("OR\n");
                                 return OR;
                             }
                         }
@@ -280,6 +305,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("PLUS\n");
                                 return PLUS;
                             }
                         }
@@ -289,7 +315,9 @@ WHITESPACE      \f|\t|" "
                                 printf("RBRACE\n");
                             }
                             num_colunas += yyleng;
+                            BEGIN AUX_STATE;
                             if(return_flag == 1){
+                                //printf("RBRACE\n");
                                 return RBRACE;
                             }
                         }
@@ -299,7 +327,9 @@ WHITESPACE      \f|\t|" "
                                 printf("RPAR\n");
                             }
                             num_colunas += yyleng;
+                            BEGIN AUX_STATE;
                             if(return_flag == 1){
+                                //printf("RPAR\n");
                                 return RPAR;
                             }
                         }
@@ -309,7 +339,9 @@ WHITESPACE      \f|\t|" "
                                 printf("RSQ\n");
                             }
                             num_colunas += yyleng;
+                            BEGIN AUX_STATE;
                             if(return_flag == 1){
+                                //printf("RSQ\n");
                                 return RSQ;
                             }
                         }
@@ -320,6 +352,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("SEMICOLON\n");
                                 return SEMICOLON;
                             }
                         }
@@ -330,6 +363,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("ARROW\n");
                                 return ARROW;
                             }
                         }
@@ -340,6 +374,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("LSHIFT\n");
                                 return LSHIFT;
                             }
                         }
@@ -350,6 +385,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("RSHIFT\n");
                                 return RSHIFT;
                             }
                         }
@@ -360,6 +396,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("XOR\n");
                                 return XOR;
                             }
                         }
@@ -370,6 +407,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("BOOL\n");
                                 return BOOL;
                             }
                         }
@@ -380,6 +418,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("CLASS\n");
                                 return CLASS;
                             }
                         }
@@ -390,6 +429,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("DOTLENGTH\n");
                                 return DOTLENGTH;
                             }
                         }
@@ -400,6 +440,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("DOUBLE\n");
                                 return DOUBLE;
                             }
                         }
@@ -410,6 +451,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("ELSE\n");
                                 return ELSE;
                             }
                         }
@@ -420,6 +462,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("INT\n");
                                 return INT;
                             }
                         }
@@ -431,6 +474,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng; 
                             if(return_flag == 1){
+                                //printf("PRINT\n");
                                 return PRINT;
                             }
                         }
@@ -441,6 +485,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("PARSEINT\n");
                                 return PARSEINT;
                             }
                         }
@@ -451,6 +496,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){ 
+                                //printf("PUBLIC\n");
                                 return PUBLIC;
                             }
                         }
@@ -460,7 +506,9 @@ WHITESPACE      \f|\t|" "
                                 printf("RETURN\n");
                             }
                             num_colunas += yyleng;
+                            BEGIN AUX_STATE;
                             if(return_flag == 1){ 
+                                //printf("RETURN\n");
                                 return RETURN;
                             }
                         }
@@ -471,6 +519,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){ 
+                                //printf("STATIC\n");
                                 return STATIC;
                             }
                         }
@@ -481,6 +530,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){ 
+                                //printf("STRING\n");
                                 return STRING;
                             }
                         }
@@ -491,6 +541,7 @@ WHITESPACE      \f|\t|" "
                             }
                             num_colunas += yyleng;
                             if(return_flag == 1){ 
+                                //printf("VOID\n");
                                 return VOID;
                             }
                         }
@@ -498,9 +549,10 @@ WHITESPACE      \f|\t|" "
 "while"                 {
                             if(imprime==1){
                                 printf("WHILE\n");
-                                }
+                            }
                             num_colunas += yyleng;
                             if(return_flag == 1){
+                                //printf("WHILE\n");
                                 return WHILE;
                             }
                         }
@@ -516,6 +568,7 @@ WHITESPACE      \f|\t|" "
                             yylval.str = (char *) strdup(yytext);
                             num_colunas += yyleng;
                             if(return_flag == 1){ 
+                                //printf("RESERVED\n");
                                 return RESERVED;
                             }
                         }
@@ -524,9 +577,11 @@ WHITESPACE      \f|\t|" "
                             if(imprime==1){
                                 printf("ID(%s)\n", yytext);
                             } 
-                            num_colunas += yyleng; 
+                            num_colunas += yyleng;
+                            BEGIN AUX_STATE;
                             yylval.str = (char *) strdup(yytext);
                             if(return_flag == 1){ 
+                                //printf("ID\n");
                                 return ID;
                             }
                         }
@@ -563,8 +618,7 @@ WHITESPACE      \f|\t|" "
                             parse_error = 0; 
                             if(imprime == 1 || erros == 1){
                                 parse_error = 1; 
-                                printf("Line %d, col %d: unterminated comment\n", commentline, commentcol); 
-                                errorline = num_linhas; errorcol = num_colunas;
+                                printf("Line %d, col %d: unterminated comment\n", commentline, commentcol);
                             } 
                             return 0;
                         }
@@ -586,7 +640,7 @@ WHITESPACE      \f|\t|" "
                                 strcpy(string,"\""); 
                                 erro = 0; 
                                 errorcol = num_colunas; 
-                                errorline=num_linhas; 
+                                errorline = num_linhas; 
                                 num_colunas += yyleng;
                             }
 
@@ -594,11 +648,12 @@ WHITESPACE      \f|\t|" "
                                 strcat(string, "\""); 
                                 if(erro == 0){
                                     printString(string); 
-                                    BEGIN 0; 
+                                    BEGIN AUX_STATE;
                                     num_colunas += yyleng;
                                     yytext = string;
                                     yylval.str = (char *) strdup(string); 
                                     if(return_flag == 1){
+                                        //printf("STRINGLIT\n");
                                         return STRLIT;
                                     }
                                 }
@@ -609,6 +664,7 @@ WHITESPACE      \f|\t|" "
                             }
                             
 <STRINGLIT>{NEWLINE}        {
+                                //parse_error = 0;
                                 if (imprime == 1 || erros == 1){
                                     printf("Line %d, col %d: unterminated string literal\n", errorline, errorcol);
                                 }
@@ -618,6 +674,7 @@ WHITESPACE      \f|\t|" "
                             }
 
 <STRINGLIT><<EOF>>          {
+                                //parse_error = 0;
                                 if (imprime == 1 || erros == 1){
                                     printf("Line %d, col %d: unterminated string literal\n", errorline, errorcol);
                                 } 
@@ -634,24 +691,89 @@ WHITESPACE      \f|\t|" "
                             }
 
 <STRINGLIT>{validesc}       {
+                                //parse_error = 0; 
                                 strcat(string, yytext); 
                                 num_colunas += yyleng;
                             }
                             
 <STRINGLIT>{STRLIT}         {
+                                //parse_error = 0; 
                                 strcat(string, yytext); 
                                 num_colunas += yyleng;
                             }
 
 <STRINGLIT>.                {
+                                //parse_error = 0; 
                                 strcat(string, yytext); 
                                 num_colunas += yyleng;
                             }
 
+
+<AUX_STATE>{WHITESPACE}       {
+                                        parse_error = 0;
+                                        num_colunas += yyleng;
+                                    }
+
+<AUX_STATE>";"                {
+                                        parse_error = 0;
+                                        num_colunas += yyleng;
+                                        BEGIN 0;
+                                        if (return_flag == 1){
+                                            //printf("SEMICOLON");
+                                            return SEMICOLON;
+                                        }
+                                    }
+
+<AUX_STATE>{NEWLINE}          {
+                                        parse_error = 1;
+                                        num_linhas++;
+                                        num_colunas = 1;
+                                        BEGIN 0;
+                                        if (return_flag == 1){
+                                            //printf("SEMICOLON\n");
+                                            return SEMICOLON;
+                                        }
+                                    }
+
+<AUX_STATE>"//"               {
+                                        parse_error = 0;
+                                        BEGIN LINECOMMENT;
+                                        if (return_flag == 1){
+                                            //printf("SEMICOLON\n");
+                                            return SEMICOLON;
+                                        }
+                                    }
+
+<AUX_STATE>"/*"               {
+                                        parse_error = 0; 
+                                        BEGIN BLOCKCOMMENT; 
+                                        commentline = num_linhas; 
+                                        commentcol = num_colunas; 
+                                        if (return_flag == 1){
+                                            //printf("SEMICOLON\n");
+                                            return SEMICOLON;
+                                        }
+                                    }
+
+<AUX_STATE>""/.                     {
+                                        parse_error = 0;
+                                        BEGIN 0;
+                                    }
+                                    
+<AUX_STATE><<EOF>>                  {
+                                        parse_error = 0;
+                                        BEGIN 0;
+                                        parse_error = 1;
+                                        if (return_flag == 1){
+                                            //printf("SEMICOLON\n");
+                                            return SEMICOLON;
+                                        }
+                                    }
+                                    
+
 <<EOF>>         {
-                    //num_colunas += 1; 
-                    parse_error = 1;
-                   
+                    num_colunas += 1; 
+                    parse_error = 1;    
                     return 0;
                 }
 
