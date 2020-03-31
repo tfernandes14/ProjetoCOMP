@@ -194,7 +194,6 @@ FormalParams:   Type ID FormalParamsOpt     {
                                                 if($3 != NULL){
                                                     add_bro(paramsDecl, $3);
                                                     add_child(parametros, $3);
-                                                    tipo = NULL;
                                                 } 
                                                 $$ = parametros;
                                             }
@@ -218,7 +217,7 @@ FormalParamsOpt:    COMMA Type ID FormalParamsOpt       {
                                                             add_child(paramdecl, idd);
                                                             add_bro($2, idd);
                                                             if ($4 != NULL){
-                                                                add_bro(idd, $4);
+                                                                add_bro(paramdecl, $4);
                                                             }
                                                             $$ = paramdecl;
                                                             
