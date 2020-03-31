@@ -61,27 +61,3 @@ struct node *add_bro(node * s1, node * s2){
 	}
 	return s1;
 }
-
-
-/*void print_tree(node *head, int depth){
-    if (head == NULL){
-        return;
-    }
-
-    for (int i = 0; i < depth; i++){
-        printf("..");
-    }
-
-    if (strcmp(head->value, "") == 0){
-        printf("%s\n", head->type);
-    }
-    else{
-        printf("%s(%s)\n", head->type, head->value);
-    }
-
-    for (int j = 0; j < head->index_childs; j++){
-        print_tree(head->childs[j], depth++);
-    }
-
-    free(head);
-}*/

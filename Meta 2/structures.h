@@ -17,4 +17,3 @@ typedef struct node{
 struct node *create_node(char *type, char* value);
 struct node *add_child(node *dad, node *child);
 struct node *add_bro(node * s1, node * s2);
-//void print_tree(node *head, int depth);
