@@ -155,8 +155,8 @@ FormalParams:   Type ID FormalParamsOpt     {
                                                 add_child(paramsDecl, id);
                                                 add_bro($1, id);
                                                 if($3 != NULL){
-                                                    add_child(parametros,$3);
-                                                    add_bro(paramsDecl,$3);
+                                                    add_child(parametros, $3);
+                                                    add_bro(idd, $3);
                                                 } 
                                                 $$ = parametros;
                                             }
