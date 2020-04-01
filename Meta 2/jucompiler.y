@@ -28,6 +28,7 @@
 
     int error_tag = 0, imprime = 0, erros = 0, return_flag = 0, recursao = 0;
     char *tipo;
+    int contador = 0;
 %}
 
 %union{
@@ -194,6 +195,7 @@ FormalParams:   Type ID FormalParamsOpt     {
                                                 if($3 != NULL){
                                                     add_bro(paramsDecl, $3);
                                                     add_child(parametros, $3);
+                                                    tipo = NULL;
                                                 } 
                                                 $$ = parametros;
                                             }
@@ -217,7 +219,7 @@ FormalParamsOpt:    COMMA Type ID FormalParamsOpt       {
                                                             add_child(paramdecl, idd);
                                                             add_bro($2, idd);
                                                             if ($4 != NULL){
-                                                                add_bro(paramdecl, $4);
+                                                                add_bro(idd, $4);
                                                             }
                                                             $$ = paramdecl;
                                                             
@@ -278,7 +280,14 @@ VarDeclOpt: COMMA ID VarDeclOpt                     {
     ;
 
 Statement:  LBRACE StatementOpt RBRACE                  {
-                                                            $$ = $2;
+                                                            if ($2 != NULL && $2->bros != NULL){
+                                                                struct node *block = create_node("Block", "");
+                                                                add_child(block, $2);
+                                                                $$ = block;
+                                                            }
+                                                            else{
+                                                                $$ = $2;
+                                                            }
                                                         }
     |       IF LPAR Expr RPAR Statement                 {
                                                             struct node *if1 = create_node("If","");
