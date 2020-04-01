@@ -112,13 +112,12 @@ MethodDecl: PUBLIC STATIC MethodHeader MethodBody   {
 
 FieldDecl:  PUBLIC STATIC Type ID FieldDeclOpt SEMICOLON    {
                                                                 struct node *fielddecl = create_node("FieldDecl", "");
-                                                                add_child(fielddecl, $3);
                                                                 struct node *idd = create_node("Id", $4);
+                                                                add_child(fielddecl, $3);
                                                                 add_child(fielddecl, idd);
                                                                 add_bro($3, idd);
                                                                 if ($5 != NULL){
-                                                                    add_child(fielddecl, $5);
-                                                                    add_bro(idd, $5);
+                                                                    add_bro(fielddecl, $5);
                                                                 }
                                                                 $$ = fielddecl;
                                                             }
@@ -126,11 +125,16 @@ FieldDecl:  PUBLIC STATIC Type ID FieldDeclOpt SEMICOLON    {
     ;
     
 FieldDeclOpt:   COMMA ID FieldDeclOpt       {
+                                                struct node *fielddecl = create_node("FieldDecl", "");
+                                                struct node *typ = create_node(tipo, "");
                                                 struct node *idd = create_node("Id", $2);
+                                                add_child(fielddecl, typ);
+                                                add_child(fielddecl, idd);
+                                                add_bro(typ, idd);
                                                 if ($3 != NULL){
-                                                    add_bro(idd, $3);
+                                                    add_bro(fielddecl, $3);
                                                 }
-                                                $$ = idd;
+                                                $$ = fielddecl;
                                                 
                                             }
     |           /* vazio */                 {$$ = NULL;}
@@ -194,13 +198,13 @@ FormalParams:   Type ID FormalParamsOpt     {
                                                 add_bro($1, idd);
                                                 if($3 != NULL){
                                                     add_bro(paramsDecl, $3);
-                                                    tipo = NULL;
+                                                    //tipo = NULL;
                                                 } 
                                                 $$ = paramsDecl;
                                             }
     |           STRING LSQ RSQ ID           {
-                                                struct node *paramsDecl = create_node("ParamDecl","");
-                                                struct node *string = create_node("StringArray","");
+                                                struct node *paramsDecl = create_node("ParamDecl", "");
+                                                struct node *string = create_node("StringArray", "");
                                                 struct node *idd = create_node("Id",$4);
                                                 add_child(paramsDecl, string);
                                                 add_child(paramsDecl, idd);
@@ -216,7 +220,8 @@ FormalParamsOpt:    COMMA Type ID FormalParamsOpt       {
                                                             add_child(paramdecl, idd);
                                                             add_bro($2, idd);
                                                             if ($4 != NULL){
-                                                                add_bro(idd, $4);
+                                                                add_bro(paramdecl,$4);
+                                                                //tipo = NULL;
                                                             }
                                                             $$ = paramdecl;
                                                             
