@@ -115,9 +115,9 @@ FieldDecl:  PUBLIC STATIC Type ID FieldDeclOpt SEMICOLON    {
                                                                 add_child(fielddecl, $3);
                                                                 struct node *idd = create_node("Id", $4);
                                                                 add_child(fielddecl, idd);
+                                                                add_bro($3, idd);
                                                                 if ($5 != NULL){
                                                                     add_child(fielddecl, $5);
-                                                                    add_bro($3, idd);
                                                                     add_bro(idd, $5);
                                                                 }
                                                                 $$ = fielddecl;
@@ -126,14 +126,12 @@ FieldDecl:  PUBLIC STATIC Type ID FieldDeclOpt SEMICOLON    {
     ;
     
 FieldDeclOpt:   COMMA ID FieldDeclOpt       {
+                                                struct node *idd = create_node("Id", $2);
                                                 if ($3 != NULL){
-                                                    struct node *idd = create_node("Id", $2);
                                                     add_bro(idd, $3);
-                                                    $$ = idd;
                                                 }
-                                                else{
-                                                    $$ = NULL;
-                                                }
+                                                $$ = idd;
+                                                
                                             }
     |           /* vazio */                 {$$ = NULL;}
     ;
@@ -157,23 +155,27 @@ Type:       BOOL            {
 
 MethodHeader:   Type ID LPAR MethodHeaderOpt2 RPAR      {
                                                             struct node *methodheader = create_node("MethodHeader", "");
+                                                            struct node *parametros = create_node("MethodParams","");
                                                             struct node *idd = create_node("Id", $2);
                                                             add_child(methodheader, $1);
                                                             add_child(methodheader, idd);
-                                                            add_child(methodheader, $4);
+                                                            add_child(methodheader, parametros);
+                                                            add_child(parametros, $4);
                                                             add_bro($1, idd);
-                                                            add_bro(idd, $4);
+                                                            add_bro(idd, parametros);
                                                             $$ = methodheader;
                                                         }
     |           VOID ID LPAR MethodHeaderOpt2 RPAR      {
                                                             struct node *methodheader = create_node("MethodHeader", "");
+                                                            struct node *parametros = create_node("MethodParams","");
                                                             struct node *voidy = create_node("Void", "");
                                                             struct node *idd = create_node("Id", $2);
                                                             add_child(methodheader, voidy);
                                                             add_child(methodheader, idd);
-                                                            add_child(methodheader, $4);
+                                                            add_child(methodheader, parametros);
+                                                            add_child(parametros, $4);
                                                             add_bro(voidy, idd);
-                                                            add_bro(idd, $4);
+                                                            add_bro(idd, parametros);
                                                             $$ = methodheader;
                                                         }
     ;
@@ -185,30 +187,25 @@ MethodHeaderOpt2:   FormalParams                    {
     ;
 
 FormalParams:   Type ID FormalParamsOpt     {
-                                                struct node *parametros = create_node("MethodParams","");
                                                 struct node *paramsDecl = create_node("ParamDecl","");
                                                 struct node *idd = create_node("Id", $2);
-                                                add_child(parametros, paramsDecl);
                                                 add_child(paramsDecl, $1);
                                                 add_child(paramsDecl, idd);
                                                 add_bro($1, idd);
                                                 if($3 != NULL){
                                                     add_bro(paramsDecl, $3);
-                                                    add_child(parametros, $3);
                                                     tipo = NULL;
                                                 } 
-                                                $$ = parametros;
+                                                $$ = paramsDecl;
                                             }
     |           STRING LSQ RSQ ID           {
-                                                struct node *parametros = create_node("MethodParams","");
                                                 struct node *paramsDecl = create_node("ParamDecl","");
                                                 struct node *string = create_node("StringArray","");
                                                 struct node *idd = create_node("Id",$4);
-                                                add_child(parametros, paramsDecl);
                                                 add_child(paramsDecl, string);
                                                 add_child(paramsDecl, idd);
                                                 add_bro(string, idd);
-                                                $$ = parametros;
+                                                $$ = paramsDecl;
                                             }
     ;
 
@@ -291,18 +288,24 @@ Statement:  LBRACE StatementOpt RBRACE                  {
                                                         }
     |       IF LPAR Expr RPAR Statement                 {
                                                             struct node *if1 = create_node("If","");
-                                                            add_child(if1,$3);
-                                                            add_child(if1,$5);
-                                                            add_bro($3,$5);
+                                                            add_child(if1, $3);
+                                                            add_child(if1, $5);
+                                                            struct node *block = create_node("Block", "");
+                                                            add_child(if1, block);
+                                                            add_bro($3, $5);
+                                                            add_bro($5, block);
                                                             $$ = if1;
                                                         }
     |       IF LPAR Expr RPAR Statement ELSE Statement  {
-                                                            struct node *if2 = create_node("If","");
-                                                            add_child(if2,$3);
-                                                            add_child(if2,$5);
-                                                            add_child(if2,$7);
-                                                            add_bro($3,$5);
-                                                            add_bro($5,$7);
+                                                            struct node *if2 = create_node("If", "");
+                                                            add_child(if2, $3);
+                                                            add_child(if2, $5);
+                                                            struct node *block = create_node("Block", "");
+                                                            add_child(if2, block);
+                                                            add_bro($3, $5);
+                                                            add_bro($5, block);
+                                                            add_child(if2, $7); // Temos de ver aqui
+                                                            add_bro($5, $7);    // Temos de ver isto
                                                             $$ = if2;
                                                         }
     |       WHILE LPAR Expr RPAR Statement              {
@@ -310,6 +313,9 @@ Statement:  LBRACE StatementOpt RBRACE                  {
                                                             add_child(whi, $3);
                                                             add_child(whi, $5);
                                                             add_bro($3, $5);
+                                                            struct node *block = create_node("Block", "");
+                                                            add_child(whi, block);
+                                                            add_bro($5, block);
                                                             $$ = whi;
                                                         }
     |       RETURN StatementOpt3 SEMICOLON              {
@@ -329,10 +335,18 @@ Statement:  LBRACE StatementOpt RBRACE                  {
     ;
 
 StatementOpt:   Statement StatementOpt      {
-                                                if ($2 != NULL){
-                                                    add_bro($1, $2);
+                                                if ($1 == NULL && $2 == NULL){
+                                                    $$ = NULL;
                                                 }
-                                                $$ = $1;
+                                                else if ($1 == NULL){
+                                                    $$ = $2;
+                                                }
+                                                else if ($2 == NULL){
+                                                    $$ = $1;
+                                                }
+                                                else{
+                                                    $$ = add_bro($1, $2);
+                                                }
                                             }
     |           /* vazio */                 {$$ = NULL;}
     ;
@@ -659,7 +673,9 @@ int main(int argc, char **argv){
             // IMPRIMIR ARVORE, ja temos de dar os returns;
             return_flag = 1;
             yyparse();
-            print_tree(head, 0);
+            if(error_tag == 0){
+                print_tree(head, 0);
+            }
         }
 
         else if (strcmp(argv[1], "-e2") == 0){
