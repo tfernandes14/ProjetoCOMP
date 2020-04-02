@@ -649,9 +649,7 @@ WHITESPACE      \f|\t|" "
                             }
 
 <<EOF>>         {
-                    //num_colunas += 1; 
                     parse_error = 1;
-                   
                     return 0;
                 }
 

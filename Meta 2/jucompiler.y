@@ -198,7 +198,6 @@ FormalParams:   Type ID FormalParamsOpt     {
                                                 add_bro($1, idd);
                                                 if($3 != NULL){
                                                     add_bro(paramsDecl, $3);
-                                                    //tipo = NULL;
                                                 } 
                                                 $$ = paramsDecl;
                                             }
@@ -221,7 +220,6 @@ FormalParamsOpt:    COMMA Type ID FormalParamsOpt       {
                                                             add_bro($2, idd);
                                                             if ($4 != NULL){
                                                                 add_bro(paramdecl,$4);
-                                                                //tipo = NULL;
                                                             }
                                                             $$ = paramdecl;
                                                             
@@ -239,10 +237,19 @@ MethodBody:     LBRACE MethodBody2 RBRACE   {
     ;
 
 MethodBody2:    Statement MethodBody2       {
-                                                if ($2 != NULL){
-                                                    add_bro($1, $2);
+                                                if ($1 == NULL && $2 == NULL){
+                                                    $$ = NULL;
                                                 }
-                                                $$ = $1;
+                                                else if ($1 == NULL){
+                                                    $$ = $2;
+                                                }
+                                                else if ($2 == NULL){
+                                                    $$ = $1;
+                                                }
+                                                else{
+                                                    $$ = add_bro($1, $2);
+                                                }
+
                                             }
     |           VarDecl MethodBody2         {
                                                 if ($2 != NULL){
@@ -294,42 +301,78 @@ Statement:  LBRACE StatementOpt RBRACE                  {
     |       IF LPAR Expr RPAR Statement                 {
                                                             struct node *if1 = create_node("If","");
                                                             add_child(if1, $3);
-                                                            add_child(if1, $5);
-                                                            struct node *block = create_node("Block", "");
-                                                            add_child(if1, block);
-                                                            add_bro($3, $5);
-                                                            add_bro($5, block);
-                                                            $$ = if1;
+                                                            if($5 != NULL){
+                                                                add_child(if1, $5);
+                                                                struct node *block = create_node("Block", "");
+                                                                add_child(if1, block);
+                                                                add_bro($3, $5);
+                                                                add_bro($5, block);
+                                                                $$ = if1;
+                                                            }
+                                                            else{
+                                                                struct node *block1 = create_node("Block","");
+                                                                add_child(if1, block1);
+                                                                struct node *block2 = create_node("Block", "");
+                                                                add_child(if1, block2);
+                                                                add_bro($3, block1);
+                                                                add_bro(block1, block2);
+                                                                $$ = if1;
+                                                            }
                                                         }
     |       IF LPAR Expr RPAR Statement ELSE Statement  {
                                                             struct node *if2 = create_node("If", "");
                                                             add_child(if2, $3);
-                                                            add_child(if2, $5);
-                                                            struct node *block = create_node("Block", "");
-                                                            add_child(if2, block);
-                                                            add_bro($3, $5);
-                                                            add_bro($5, block);
-                                                            add_child(if2, $7); // Temos de ver aqui
-                                                            add_bro($5, $7);    // Temos de ver isto
-                                                            $$ = if2;
+                                                            if($5 != NULL){
+                                                                add_child(if2, $5);
+                                                                add_bro($3, $5);
+                                                                if($7 != NULL){
+                                                                    add_child(if2, $7);
+                                                                    add_bro($5, $7);
+                                                                    $$ = if2;
+                                                                }else{
+                                                                    struct node *block2 = create_node("Block", "");
+                                                                    add_child(if2, block2);
+                                                                    add_bro($5, block2);
+                                                                    $$ = if2;
+                                                                }
+                                                            }else{
+                                                                struct node *block = create_node("Block", "");
+                                                                add_child(if2, block);
+                                                                add_bro($3, block);
+                                                                if($7 != NULL){
+                                                                    add_child(if2, $7);
+                                                                    add_bro(block, $7);
+                                                                    $$ = if2;
+                                                                }else{
+                                                                    struct node *block2 = create_node("Block", "");
+                                                                    add_child(if2, block2);
+                                                                    add_bro(block, block2);
+                                                                    $$ = if2;
+                                                                }
+                                                            }
                                                         }
     |       WHILE LPAR Expr RPAR Statement              {
                                                             struct node *whi = create_node("While", "");
                                                             add_child(whi, $3);
-                                                            add_child(whi, $5);
-                                                            add_bro($3, $5);
-                                                            struct node *block = create_node("Block", "");
-                                                            add_child(whi, block);
-                                                            add_bro($5, block);
-                                                            $$ = whi;
+                                                            if($5 != NULL){
+                                                                add_child(whi, $5);
+                                                                add_bro($3, $5);
+                                                                $$ = whi;
+                                                            }
+                                                            else{
+                                                                struct node *block = create_node("Block", "");
+                                                                add_child(whi, block);
+                                                                add_bro($3, block);
+                                                                $$ = whi;
+                                                            }
                                                         }
     |       RETURN StatementOpt3 SEMICOLON              {
                                                             struct node *ret = create_node("Return","");
                                                             add_child(ret,$2);
                                                             $$ = ret;
                                                         }
-    |       StatementOpt4 SEMICOLON                     {
-                                                            $$ = $1;
+    |       StatementOpt4 SEMICOLON                     {                                                 
+                                                            $$ = $1;                                                 
                                                         }
     |       PRINT LPAR StatementOpt5 RPAR SEMICOLON     {
                                                             struct node *pri = create_node("Print","");
@@ -676,6 +719,7 @@ int main(int argc, char **argv){
 
         else if (strcmp(argv[1], "-t") == 0){
             // IMPRIMIR ARVORE, ja temos de dar os returns;
+            erros = 1;
             return_flag = 1;
             yyparse();
             if(error_tag == 0){

@@ -1894,15 +1894,13 @@ case YY_STATE_EOF(LINECOMMENT):
 case YY_STATE_EOF(TERMINATOR):
 #line 651 "jucompiler.l"
 {
-                    //num_colunas += 1; 
                     parse_error = 1;
-                   
                     return 0;
                 }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 658 "jucompiler.l"
+#line 656 "jucompiler.l"
 {
                     if(imprime == 1 || erros == 1){
                         printf("Line %d, col %d: illegal character (%s)\n", num_linhas, num_colunas, yytext);
@@ -1912,10 +1910,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 665 "jucompiler.l"
+#line 663 "jucompiler.l"
 ECHO;
 	YY_BREAK
-#line 1919 "lex.yy.c"
+#line 1917 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2930,7 +2928,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 665 "jucompiler.l"
+#line 663 "jucompiler.l"
 
 
 void printString(char * string){
