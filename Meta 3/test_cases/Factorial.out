@@ -1,3 +1,16 @@
+===== Class Factorial Symbol Table =====
+factorial	(int)	int
+main	(String[])	void
+
+===== Method factorial(int) Symbol Table =====
+return		int
+n		int	param
+
+===== Method main(String[]) Symbol Table =====
+return		void
+args		String[]	param
+argument		int
+
 Program
 ..Id(Factorial)
 ..MethodDecl
@@ -10,20 +23,20 @@ Program
 ..........Id(n)
 ....MethodBody
 ......If
-........Eq
-..........Id(n)
-..........DecLit(0)
+........Eq - boolean
+..........Id(n) - int
+..........DecLit(0) - int
 ........Return
-..........DecLit(1)
+..........DecLit(1) - int
 ........Block
 ......Return
-........Mul
-..........Id(n)
-..........Call
-............Id(factorial)
-............Sub
-..............Id(n)
-..............DecLit(1)
+........Mul - int
+..........Id(n) - int
+..........Call - int
+............Id(factorial) - (int)
+............Sub - int
+..............Id(n) - int
+..............DecLit(1) - int
 ..MethodDecl
 ....MethodHeader
 ......Void
@@ -36,12 +49,12 @@ Program
 ......VarDecl
 ........Int
 ........Id(argument)
-......Assign
-........Id(argument)
-........ParseArgs
-..........Id(args)
-..........DecLit(0)
+......Assign - int
+........Id(argument) - int
+........ParseArgs - int
+..........Id(args) - String[]
+..........DecLit(0) - int
 ......Print
-........Call
-..........Id(factorial)
-..........Id(argument)
+........Call - int
+..........Id(factorial) - (int)
+..........Id(argument) - int
