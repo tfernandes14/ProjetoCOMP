@@ -64,11 +64,12 @@ void check_func_decl(struct node * node) {
 	for(int i = 0 ; i < methodBody->index_childs; i++){
 		//VarDecl = pai, 2 filhos (type) e (value)
 		if(strcmp(methodBody->childs[i]->type, "VarDecl") == 0){
+			(new_symbol->funcdecl->n_params)++;
 			char * var = (char *) malloc(strlen(methodBody->childs[i]->childs[0]->type) * sizeof(char));
 			strcpy(var, methodBody->childs[i]->childs[0]->type);
 			*var = tolower(*var);
 
-			insert_vardecl(methodBody->childs[i]->childs[1]->value, var,"null", &(new_symbol->funcdecl->vars));
+			insert_vardecl(methodBody->childs[i]->childs[1]->value, var, "null", &(new_symbol->funcdecl->vars));
 
 			free(var);
 		}
