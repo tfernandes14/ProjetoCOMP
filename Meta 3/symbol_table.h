@@ -24,15 +24,16 @@ typedef struct table_element {
 } table_element;
 
 table_element * insert_class(char * identifier);
-table_element * insert_fielddecl(char *id, char * type, table_element ** symtab);
-table_element * insert_vardecl(char * identifier, char * type,char * param, table_element ** symtab);
-table_element * insert_funcdecl(char * identifier, char * return_type);
-table_element * insert_element(table_element * new_symbol, table_element ** symtab);
-
-table_element * search_element(char * identifier, table_element * symtab);
+table_element * insert_fielddecl(char *id, char * type, char * param);
+table_element * insert_vardecl(char * identifier, char * type,char * param, table_element ** table);
+table_element * create_funcdecl(char * identifier, char * return_type);
+table_element *insert_func(table_element *new, table_element **table);
+table_element * insert_function(table_element * new, table_element **table);
+table_element * insert_element(table_element * new_symbol, table_element ** table);
+table_element * search_element(char * identifier, table_element * table);
 
 void show_table();
-void free_table(table_element * symtab);
+void free_table(table_element * table);
 
 extern table_element * global_table;
 

@@ -150,7 +150,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 25 "jucompiler.y" /* yacc.c:1909  */
+#line 27 "jucompiler.y" /* yacc.c:1909  */
 
     char *str;
     struct node *node;

@@ -14,7 +14,7 @@ void create_symbol_table(struct node *head) {
 		}
 
 		else if (strcmp(child->type, "FieldDecl") == 0) {
-			check_field_decl(child, &global_table);
+			check_field_decl(child);
 		}
 	}	
 }
@@ -23,13 +23,14 @@ void check_class(struct node *node){
 	char * id = (char *) malloc(strlen(node->type) * sizeof(char));
 	strcpy(id, node->value);
 
-	table_element * novo = insert_class(id);
+	insert_class(id);
+	/*table_element * novo = insert_class(id);
     if(novo == NULL){
         printf("Symbol already defined!");
-    }
+    }*/
 }
 
-void check_field_decl(struct node *node, table_element **symtab) {
+void check_field_decl(struct node *node) {
 
 	char * type = (char*) malloc(strlen(node->childs[0]->type) * sizeof(char));
 	strcpy(type, node->childs[0]->type);
@@ -38,28 +39,30 @@ void check_field_decl(struct node *node, table_element **symtab) {
 	char * value = (char*) malloc(strlen(node->childs[1]->value) * sizeof(char));
 	strcpy(value, node->childs[1]->value);
 
-    table_element * novo = insert_vardecl(value, type, "null", symtab);
+	insert_fielddecl(value, type, "null");
+    /*table_element * novo = insert_vardecl(value, type, "null", symtab);
     if(novo == NULL){
         printf("Symbol already defined!");
-    }
+    }*/
 }
 
 void check_func_decl(struct node * node) {
-	
 	char * return_name;
 
 	// Entra no MethodHeader
 	struct node *methodHeader = node->childs[0];
 
-	//primeiro filho = tipo de return
 	return_name = (char *) malloc(strlen(methodHeader->childs[0]->type) * sizeof(char));
 	strcpy(return_name, methodHeader->childs[0]->type);
 	*return_name = tolower(*return_name);
+	
 	char * id_function = (char *) malloc(strlen(methodHeader->childs[1]->value) * sizeof(char));
 	strcpy(id_function, methodHeader->childs[1]->value);
+	//primeiro filho = tipo de return
+	//printf("PETRA PETRA (%s) 	(%s)\n", return_name, id_function);
 
-	table_element * new_symbol = insert_funcdecl(id_function, return_name);
-	//Parametros do methodHeader
+	table_element * new_symbol = create_funcdecl(id_function, return_name); //recebemos o novo no criado
+	//Parametros do methodHeader e adicionar os parametros ao no
 	struct node *methodParams = methodHeader->childs[2];
 	for(int i = 0 ; i < methodParams->index_childs; i++){
 		(new_symbol->funcdecl->n_params)++;
@@ -72,24 +75,77 @@ void check_func_decl(struct node * node) {
 
 		free(var);
 	}
+ 	//fazer comparacao para se ja existe
+	table_element * aux = global_table;
+	int flag = 0;
+
+	while(aux != NULL){
+		table_element * no = search_element(id_function, aux);
+		if(no != NULL){
+			// Os nos sao do mesmo tipo
+			if (no->decl_type == new_symbol->decl_type){
+				// Os nos sao do mesmo tipo (class, funcdecl,...)
+				if(strcmp(no->funcdecl->type_return, new_symbol->funcdecl->type_return) == 0){
+					// Os nos retornam o mesmo tipo
+					if(no->funcdecl->n_params == new_symbol->funcdecl->n_params){
+						// O nr de parametros e o mesmo
+						table_element *var_no = no->funcdecl->vars;
+						table_element *var_aux = new_symbol->funcdecl->vars;
+
+						int parametros_iguais = 0;
+						for (int i = 0; i < no->funcdecl->n_params; i++){
+							if (strcmp(var_no->vardecl->type, var_aux->vardecl->type) == 0){
+								parametros_iguais++;
+							}
+							var_no = var_no->next;
+							var_aux = var_aux->next;
+						}
+
+						if (parametros_iguais == no->funcdecl->n_params){
+							// NAO TEMOS AQUI UM ERRO EHEHEH XD
+							flag = 1;
+							break;
+						}
+					}
+				}
+			}
+		}
+		aux = aux->next;
+	}
+
+
+	if(flag == 0){
+		insert_function(new_symbol, &global_table);
+		//printf("adicionei o %s \n", new_symbol->id);
+	}
+
 	//Parametros do Body
 	struct node *methodBody = node->childs[1];
-
 	for(int i = 0 ; i < methodBody->index_childs; i++){
-		//VarDecl = pai, 2 filhos (type) e (value)
-		if(strcmp(methodBody->childs[i]->type, "VarDecl") == 0){
+		if(strcmp(methodBody->childs[i]->type, "VarDecl") == 0){ 
+			//VarDecl = pai, 2 filhos (type) e (value)>type, "VarDecl") == 0){
 			(new_symbol->funcdecl->n_params)++;
 			char * var = (char *) malloc(strlen(methodBody->childs[i]->childs[0]->type) * sizeof(char));
 			strcpy(var, methodBody->childs[i]->childs[0]->type);
 			*var = tolower(*var);
 
 			insert_vardecl(methodBody->childs[i]->childs[1]->value, var, "null", &(new_symbol->funcdecl->vars));
-
 			free(var);
 		}
+		else if (strcmp(methodBody->childs[i]->type, "Call")==0){
+			continue;
+		}
+		else if (strcmp(methodBody->childs[i]->type, "If")==0){
+			continue;
+		}else if (strcmp(methodBody->childs[i]->type, "While")==0){
+			continue;
+		}else if (strcmp(methodBody->childs[i]->type, "Block")==0){
+			continue;
+		}
 	}
-
+	//printf("CHEGUEI AQUI\n");
 }
+
 
 struct node *create_node(char *type, char* value){
     struct node *new = (struct node *) malloc(sizeof( node));
@@ -200,21 +256,18 @@ void print_tree_annotated(struct node *head, int depth){
 void add_annotation(struct node *node, char *annotation){
 	node->annotation = (char *) malloc(sizeof(char) * strlen(annotation));
 	strcpy(node->annotation, annotation);
-	printf("ENTREI %s -- %s\n", node->type, node->annotation);
+	//printf("Inseri anotacao %s -- %s\n", node->type, node->annotation);
 }
 
-void create_ast(struct node *node){
+void create_ast(struct node *node, table_element *table){
 	if(strcmp(node->type, "Add") == 0 || strcmp(node->type, "Sub") == 0 || strcmp(node->type, "Mul") == 0 || strcmp(node->type, "Div") == 0 || strcmp(node->type, "Mod") == 0 || strcmp(node->type, "Assign") == 0){
 		/*
 			aqui, mandar correr o filho0, filho1(...), verificar se anotacao dos filhos e igual
 			se for igual adicionar anotacao do filho ao pai
 			se nao for e undef
 		*/
-		printf("1\n");
-		create_ast(node->childs[0]);
-		printf("bacalhau\n");
-		create_ast(node->childs[1]);
-		printf("a bras\n");
+		create_ast(node->childs[0], table);
+		create_ast(node->childs[1], table);
 
 		if(strcmp(node->childs[0]->annotation, node->childs[1]->annotation) == 0){
 			add_annotation(node, node->childs[0]->annotation);
@@ -222,44 +275,101 @@ void create_ast(struct node *node){
 		else{
 			add_annotation(node, "undef");
 		}
-	}	
+	}
 
 	else if(strcmp(node->type, "And") == 0 || strcmp(node->type, "Or") == 0 || strcmp(node->type, "Xor") == 0 || strcmp(node->type, "Eq") == 0 || strcmp(node->type, "Ge") == 0 || strcmp(node->type, "Gt") == 0 || strcmp(node->type, "Le") == 0 || strcmp(node->type, "Lt") == 0 || strcmp(node->type, "Ne") == 0){
 		// corre filho 0 e filho 1, e dizer que o pai vai ser boolean
-		printf("2\n");
-		create_ast(node->childs[0]);
-		create_ast(node->childs[1]);
+		//printf("2\n");
+		create_ast(node->childs[0], table);
+		create_ast(node->childs[1], table);
 		add_annotation(node, "boolean");
 	}
 
 	else if(strcmp(node->type, "Not") == 0 || strcmp(node->type, "Minus") == 0 || strcmp(node->type, "Plus") == 0){
 		 //manda correr o filho e adicionar o tipo do filho
-		 printf("3\n"); 
-		create_ast(node->childs[0]);
+		 //printf("3\n"); 
+		create_ast(node->childs[0], table);
 		add_annotation(node, node->childs[0]->annotation);
 	}
+
+	else if (strcmp(node->type, "ParseArgs") == 0){
+		create_ast(node->childs[0], table);
+		create_ast(node->childs[1], table);
+		add_annotation(node, "int");
+	}
+
 	else if(strcmp(node->type, "Id") == 0){
 		/*
 			se o id for uma funcao, meter "(tipo)""
 			se nao, meter "tipo"
 			se a funcao nao existir, meter "undef"
 		*/
-		printf("[ID] Ainda nao fui tratado\n");
-		add_annotation(node, "null");
+		table_element * procura_id = search_element(node->value, table);
+		if (procura_id == NULL){
+			table_element *procura_id_global = search_element(node->value, global_table);
+			if (procura_id_global != NULL){
+				int tipo = procura_id_global->decl_type;
+				if (tipo == 1){
+					// Tipo func;
+					char * aux = (char *) malloc((strlen(procura_id_global->funcdecl->type_return) + 2) * sizeof(char));
+					strcat(aux, "(");
+					strcat(aux, procura_id_global->funcdecl->type_return);
+					strcat(aux, ")");
+					add_annotation(node, aux);
+				}
+				else if (tipo == 3){
+					// Tipo fielddecl
+					add_annotation(node, procura_id_global->vardecl->type);
+				}
+			}
+			else{
+				// else - ERRO
+				add_annotation(node, "undef");
+			}
+		}
+		else{
+			add_annotation(node, procura_id->vardecl->type);
+		}
 	}
+
 	else if(strcmp(node->type, "DecLit") == 0 || strcmp(node->type, "Length") == 0 || strcmp(node->type, "ParseArgs") == 0){
 		add_annotation(node, "int");
 	}
+
 	else if(strcmp(node->type, "RealLit") == 0){
 		add_annotation(node, "double");
 	}
+
 	else if(strcmp(node->type, "BoolLit") == 0){
 		add_annotation(node, "boolean");
 	}
 
 	else if(strcmp(node->type, "Call") == 0){
-		printf("[CALL] Ainda n fui tratado\n");
-		add_annotation(node, "null");
+		create_ast(node->childs[0], table);
+		table_element *procura_id = search_element(node->childs[0]->value, global_table);
+		if (procura_id != NULL){
+			if (procura_id->decl_type == 1){
+				// Tipo func
+				table_element * param = procura_id->funcdecl->vars;
+				int contador = 0;
+				for (int i = 1; i < node->index_childs; i++){
+					create_ast(node->childs[i], table);
+					if (strcmp(node->childs[i]->annotation, param->vardecl->type) == 0){
+						contador++;
+					}
+					param = param->next;
+				}
+				if(contador == procura_id->funcdecl->n_params){
+					add_annotation(node, procura_id->funcdecl->type_return);
+				}
+				else{
+					add_annotation(node, "undef");
+				}
+			}
+		}
+		else{
+			add_annotation(node, "undef");
+		}
 	}
 
 	/*else if(strcmp(node->type, "Lshift") == 0){
@@ -268,10 +378,33 @@ void create_ast(struct node *node){
 	else if(strcmp(node->type, "Rshift") == 0){
 
 	}*/
+	else if (strcmp(node->type, "ParamDecl") == 0){
+		return;
+	}
+
+	else if (strcmp(node->type, "VarDecl") == 0){
+		return;
+	}
+
+	else if(strcmp(node->type, "MethodDecl")== 0){
+		struct node * methodHeader = node->childs[0];
+		struct node * methodBody = node->childs[1];
+		table_element * no_tabela = search_element(methodHeader->childs[1]->value, global_table);
+		if(no_tabela != NULL){
+			table_element * vars_no = no_tabela->funcdecl->vars;
+			create_ast(methodBody, vars_no);
+		}
+	}
+	else if(strcmp(node->type, "Program") == 0){
+		for(int i = 1; i < node->index_childs; i++){
+			create_ast(node->childs[i], table);
+		}
+	}
+
 	else{
 		for(int i = 0; i < node->index_childs; i++){
-			printf("LOOOPING %s\n",node->childs[i]->type);
-			create_ast(node->childs[i]);
+			//printf("LOOOPING %s\n",node->childs[i]->type);
+			create_ast(node->childs[i], table);
 		}
 	}
 }

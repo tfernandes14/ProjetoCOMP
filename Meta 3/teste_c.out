@@ -1,0 +1,363 @@
+PETRA PETRA (bool) 	(_length)
+PETRA PETRA (double) 	(string)
+PETRA PETRA (int) 	(Integer_parseInt)
+PETRA PETRA (void) 	(System_out_println)
+PETRA PETRA (bool) 	(a)
+PETRA PETRA (double) 	(b)
+PETRA PETRA (int) 	(c)
+PETRA PETRA (void) 	(d)
+PETRA PETRA (bool) 	(a)
+PETRA PETRA (double) 	(b)
+PETRA PETRA (int) 	(c)
+PETRA PETRA (void) 	(d)
+PETRA PETRA (double) 	(a)
+PETRA PETRA (int) 	(b)
+PETRA PETRA (void) 	(c)
+PETRA PETRA (void) 	(c)
+PETRA PETRA (void) 	(c)
+PETRA PETRA (bool) 	(c)
+PETRA PETRA (bool) 	(c)
+===== Class ST_methods0 Symbol Table =====
+_length	()	boolean
+string	()	double
+Integer_parseInt	()	int
+System_out_println	()	void
+a	(String[])	boolean
+b	(String[])	double
+c	(String[])	int
+d	(String[])	void
+a	(boolean)	boolean
+b	(double)	double
+c	(int)	int
+d	(boolean)	void
+a	(boolean,double,int)	double
+b	(double,boolean)	int
+c	(int,double,double,int,boolean,boolean,boolean)	void
+c	(boolean,int,double,int,boolean,boolean)	boolean
+c	(boolean,int,double)	boolean
+
+===== Method _length() Symbol Table =====
+return		boolean
+
+===== Method string() Symbol Table =====
+return		double
+
+===== Method Integer_parseInt() Symbol Table =====
+return		int
+
+===== Method System_out_println() Symbol Table =====
+return		void
+
+===== Method a(String[]) Symbol Table =====
+return		boolean
+arg		String[]	param
+
+===== Method b(String[]) Symbol Table =====
+return		double
+arg		String[]	param
+
+===== Method c(String[]) Symbol Table =====
+return		int
+arg		String[]	param
+
+===== Method d(String[]) Symbol Table =====
+return		void
+arg		String[]	param
+
+===== Method a(boolean) Symbol Table =====
+return		boolean
+x		boolean	param
+
+===== Method b(double) Symbol Table =====
+return		double
+y		double	param
+
+===== Method c(int) Symbol Table =====
+return		int
+z		int	param
+
+===== Method d(boolean) Symbol Table =====
+return		void
+d		boolean	param
+
+===== Method a(boolean,double,int) Symbol Table =====
+return		double
+x		boolean	param
+z		double	param
+y		int	param
+
+===== Method b(double,boolean) Symbol Table =====
+return		int
+y		double	param
+z		boolean	param
+
+===== Method c(int,double,double,int,boolean,boolean,boolean) Symbol Table =====
+return		void
+x		int	param
+y		double	param
+z		double	param
+w		int	param
+p		boolean	param
+q		boolean	param
+r		boolean	param
+
+===== Method c(boolean,int,double,int,boolean,boolean) Symbol Table =====
+return		boolean
+x		boolean	param
+y		int	param
+z		double	param
+w		int	param
+c		boolean	param
+q		boolean	param
+
+===== Method c(boolean,int,double) Symbol Table =====
+return		boolean
+x		boolean	param
+y		int	param
+z		double	param
+
+Program
+..Id(ST_methods0)
+..MethodDecl
+....MethodHeader
+......Bool
+......Id(_length)
+......MethodParams
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Double
+......Id(string)
+......MethodParams
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Int
+......Id(Integer_parseInt)
+......MethodParams
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Void
+......Id(System_out_println)
+......MethodParams
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Bool
+......Id(a)
+......MethodParams
+........ParamDecl
+..........StringArray
+..........Id(arg)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Double
+......Id(b)
+......MethodParams
+........ParamDecl
+..........StringArray
+..........Id(arg)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Int
+......Id(c)
+......MethodParams
+........ParamDecl
+..........StringArray
+..........Id(arg)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Void
+......Id(d)
+......MethodParams
+........ParamDecl
+..........StringArray
+..........Id(arg)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Bool
+......Id(a)
+......MethodParams
+........ParamDecl
+..........Bool
+..........Id(x)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Double
+......Id(b)
+......MethodParams
+........ParamDecl
+..........Double
+..........Id(y)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Int
+......Id(c)
+......MethodParams
+........ParamDecl
+..........Int
+..........Id(z)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Void
+......Id(d)
+......MethodParams
+........ParamDecl
+..........Bool
+..........Id(d)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Double
+......Id(a)
+......MethodParams
+........ParamDecl
+..........Bool
+..........Id(x)
+........ParamDecl
+..........Double
+..........Id(z)
+........ParamDecl
+..........Int
+..........Id(y)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Int
+......Id(b)
+......MethodParams
+........ParamDecl
+..........Double
+..........Id(y)
+........ParamDecl
+..........Bool
+..........Id(z)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Void
+......Id(c)
+......MethodParams
+........ParamDecl
+..........Int
+..........Id(x)
+........ParamDecl
+..........Double
+..........Id(y)
+........ParamDecl
+..........Double
+..........Id(z)
+........ParamDecl
+..........Int
+..........Id(w)
+........ParamDecl
+..........Bool
+..........Id(p)
+........ParamDecl
+..........Bool
+..........Id(q)
+........ParamDecl
+..........Bool
+..........Id(r)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Void
+......Id(c)
+......MethodParams
+........ParamDecl
+..........Int
+..........Id(x)
+........ParamDecl
+..........Double
+..........Id(y)
+........ParamDecl
+..........Bool
+..........Id(z)
+........ParamDecl
+..........Int
+..........Id(w)
+........ParamDecl
+..........Int
+..........Id(p)
+........ParamDecl
+..........Int
+..........Id(q)
+........ParamDecl
+..........Int
+..........Id(r)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Void
+......Id(c)
+......MethodParams
+........ParamDecl
+..........Int
+..........Id(x)
+........ParamDecl
+..........Double
+..........Id(y)
+........ParamDecl
+..........Bool
+..........Id(z)
+........ParamDecl
+..........Int
+..........Id(w)
+........ParamDecl
+..........Double
+..........Id(p)
+........ParamDecl
+..........Double
+..........Id(q)
+........ParamDecl
+..........Double
+..........Id(r)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Bool
+......Id(c)
+......MethodParams
+........ParamDecl
+..........Bool
+..........Id(x)
+........ParamDecl
+..........Int
+..........Id(y)
+........ParamDecl
+..........Double
+..........Id(z)
+........ParamDecl
+..........Int
+..........Id(w)
+........ParamDecl
+..........Bool
+..........Id(c)
+........ParamDecl
+..........Bool
+..........Id(q)
+....MethodBody
+..MethodDecl
+....MethodHeader
+......Bool
+......Id(c)
+......MethodParams
+........ParamDecl
+..........Bool
+..........Id(x)
+........ParamDecl
+..........Int
+..........Id(y)
+........ParamDecl
+..........Double
+..........Id(z)
+....MethodBody

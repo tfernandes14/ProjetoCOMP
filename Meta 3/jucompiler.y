@@ -9,6 +9,8 @@
 
     struct node *head = NULL;
 
+    extern table_element * global_table;
+
     int yylex(void);
     int yylex_destroy();
     void yyerror(char *s);
@@ -640,7 +642,8 @@ int main(int argc, char **argv){
             yyparse();
             create_symbol_table(head);
             show_table();
-            create_ast(head);
+            //print_tree(head, 0);
+            create_ast(head, global_table);
             print_tree_annotated(head, 0);
         }
 
