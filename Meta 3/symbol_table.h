@@ -21,12 +21,14 @@ typedef struct table_element {
 	funcdecl * funcdecl;
     vardecl * vardecl;
 	struct table_element * next;
+	int line;
+	int column;
 } table_element;
 
-table_element * insert_class(char * identifier);
-table_element * insert_fielddecl(char *id, char * type, char * param);
-table_element * insert_vardecl(char * identifier, char * type,char * param, table_element ** table);
-table_element * create_funcdecl(char * identifier, char * return_type);
+table_element *insert_class(char *id, int line, int column);
+table_element * insert_fielddecl(char *id, char * type, char * param, int line, int column);
+table_element * insert_vardecl(char * id, char * type, char * param, table_element ** table, int line, int column);
+table_element * create_funcdecl(char * id, char * type, int line, int column);
 table_element *insert_func(table_element *new, table_element **table);
 table_element * insert_function(table_element * new, table_element **table);
 table_element * insert_element(table_element * new_symbol, table_element ** table);

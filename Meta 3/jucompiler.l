@@ -5,9 +5,12 @@
     */  
     #include <string.h>
     #include "y.tab.h"
+    #define LOCATION yylloc.first_line = yylloc.last_line = yylineno, yylloc.first_column = yycolumn, yylloc.last_column = yycolumn + yyleng - 1, yycolumn += yyleng;
+   
     int imprime, erros, return_flag; // Definidas no jucompiler.y
     int num_linhas = 1;
     int num_colunas = 1;
+    int yycolumn = 1;
     int parse_error = 0;
     extern int error_tag;
     int errorline = 1, errorcol = 1;    // Erros nas STRLIT e BLOCKCOMMENT
@@ -51,6 +54,7 @@ WHITESPACE      \f|\t|" "
                                 printf("INTLIT(%s)\n", yytext);
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             yylval.str = (char *) strdup(yytext);
                             if(return_flag == 1){
                                 return INTLIT;
@@ -62,6 +66,7 @@ WHITESPACE      \f|\t|" "
                                 printf("REALLIT(%s)\n", yytext);
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             yylval.str = (char *) strdup(yytext);
                             if(return_flag == 1){
                                 return REALLIT;
@@ -71,6 +76,8 @@ WHITESPACE      \f|\t|" "
 {NEWLINE}               {
                             num_linhas++;
                             num_colunas = 1;
+                            yycolumn = 1;
+                            LOCATION;
                         }
                         
 {BOOLLIT}               {
@@ -78,6 +85,7 @@ WHITESPACE      \f|\t|" "
                                 printf("BOOLLIT(%s)\n", yytext);
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             yylval.str = (char *) strdup(yytext);
                             if(return_flag == 1){
                                 return BOOLLIT;
@@ -89,6 +97,7 @@ WHITESPACE      \f|\t|" "
                                 printf("AND\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return AND;
                             }
@@ -99,6 +108,7 @@ WHITESPACE      \f|\t|" "
                                 printf("ASSIGN\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return ASSIGN;
                             }
@@ -109,6 +119,7 @@ WHITESPACE      \f|\t|" "
                                 printf("STAR\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return STAR;
                             }
@@ -119,6 +130,7 @@ WHITESPACE      \f|\t|" "
                                 printf("COMMA\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return COMMA;
                             }
@@ -129,6 +141,7 @@ WHITESPACE      \f|\t|" "
                                 printf("DIV\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return DIV;
                             }
@@ -139,6 +152,7 @@ WHITESPACE      \f|\t|" "
                                 printf("EQ\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return EQ;
                             }
@@ -149,6 +163,7 @@ WHITESPACE      \f|\t|" "
                                 printf("GE\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return GE;
                             }
@@ -159,6 +174,7 @@ WHITESPACE      \f|\t|" "
                                 printf("GT\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return GT;
                             }
@@ -169,6 +185,7 @@ WHITESPACE      \f|\t|" "
                                 printf("IF\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return IF;
                             }
@@ -179,6 +196,7 @@ WHITESPACE      \f|\t|" "
                                 printf("LBRACE\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return LBRACE;
                             }
@@ -189,6 +207,7 @@ WHITESPACE      \f|\t|" "
                                 printf("LE\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return LE;
                             }
@@ -199,6 +218,7 @@ WHITESPACE      \f|\t|" "
                                 printf("LPAR\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return LPAR;
                             }
@@ -209,6 +229,7 @@ WHITESPACE      \f|\t|" "
                                 printf("LSQ\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return LSQ;
                             }
@@ -219,6 +240,7 @@ WHITESPACE      \f|\t|" "
                                 printf("LT\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return LT;
                             }
@@ -229,6 +251,7 @@ WHITESPACE      \f|\t|" "
                                 printf("MINUS\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return MINUS;
                             }
@@ -239,6 +262,7 @@ WHITESPACE      \f|\t|" "
                                 printf("MOD\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return MOD;
                             }
@@ -249,6 +273,7 @@ WHITESPACE      \f|\t|" "
                                 printf("NE\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return NE;
                             }
@@ -259,6 +284,7 @@ WHITESPACE      \f|\t|" "
                                 printf("NOT\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return NOT;
                             }
@@ -269,6 +295,7 @@ WHITESPACE      \f|\t|" "
                                 printf("OR\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return OR;
                             }
@@ -279,6 +306,7 @@ WHITESPACE      \f|\t|" "
                                 printf("PLUS\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return PLUS;
                             }
@@ -289,6 +317,7 @@ WHITESPACE      \f|\t|" "
                                 printf("RBRACE\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return RBRACE;
                             }
@@ -299,6 +328,7 @@ WHITESPACE      \f|\t|" "
                                 printf("RPAR\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return RPAR;
                             }
@@ -309,6 +339,7 @@ WHITESPACE      \f|\t|" "
                                 printf("RSQ\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return RSQ;
                             }
@@ -319,6 +350,7 @@ WHITESPACE      \f|\t|" "
                                 printf("SEMICOLON\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return SEMICOLON;
                             }
@@ -329,6 +361,7 @@ WHITESPACE      \f|\t|" "
                                 printf("ARROW\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return ARROW;
                             }
@@ -339,6 +372,7 @@ WHITESPACE      \f|\t|" "
                                 printf("LSHIFT\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return LSHIFT;
                             }
@@ -349,6 +383,7 @@ WHITESPACE      \f|\t|" "
                                 printf("RSHIFT\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return RSHIFT;
                             }
@@ -359,6 +394,7 @@ WHITESPACE      \f|\t|" "
                                 printf("XOR\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return XOR;
                             }
@@ -369,6 +405,7 @@ WHITESPACE      \f|\t|" "
                                 printf("BOOL\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return BOOL;
                             }
@@ -379,6 +416,7 @@ WHITESPACE      \f|\t|" "
                                 printf("CLASS\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return CLASS;
                             }
@@ -389,6 +427,7 @@ WHITESPACE      \f|\t|" "
                                 printf("DOTLENGTH\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return DOTLENGTH;
                             }
@@ -399,6 +438,7 @@ WHITESPACE      \f|\t|" "
                                 printf("DOUBLE\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return DOUBLE;
                             }
@@ -409,6 +449,7 @@ WHITESPACE      \f|\t|" "
                                 printf("ELSE\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return ELSE;
                             }
@@ -419,6 +460,7 @@ WHITESPACE      \f|\t|" "
                                 printf("INT\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return INT;
                             }
@@ -429,7 +471,8 @@ WHITESPACE      \f|\t|" "
                             if(imprime==1){
                                 printf("PRINT\n");
                             }
-                            num_colunas += yyleng; 
+                            num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return PRINT;
                             }
@@ -440,6 +483,7 @@ WHITESPACE      \f|\t|" "
                                 printf("PARSEINT\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return PARSEINT;
                             }
@@ -450,6 +494,7 @@ WHITESPACE      \f|\t|" "
                                 printf("PUBLIC\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){ 
                                 return PUBLIC;
                             }
@@ -460,6 +505,7 @@ WHITESPACE      \f|\t|" "
                                 printf("RETURN\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){ 
                                 return RETURN;
                             }
@@ -470,6 +516,7 @@ WHITESPACE      \f|\t|" "
                                 printf("STATIC\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){ 
                                 return STATIC;
                             }
@@ -480,6 +527,7 @@ WHITESPACE      \f|\t|" "
                                 printf("STRING\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){ 
                                 return STRING;
                             }
@@ -490,6 +538,7 @@ WHITESPACE      \f|\t|" "
                                 printf("VOID\n");
                             }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){ 
                                 return VOID;
                             }
@@ -500,6 +549,7 @@ WHITESPACE      \f|\t|" "
                                 printf("WHILE\n");
                                 }
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){
                                 return WHILE;
                             }
@@ -515,6 +565,7 @@ WHITESPACE      \f|\t|" "
                             } 
                             yylval.str = (char *) strdup(yytext);
                             num_colunas += yyleng;
+                            LOCATION;
                             if(return_flag == 1){ 
                                 return RESERVED;
                             }
@@ -524,7 +575,8 @@ WHITESPACE      \f|\t|" "
                             if(imprime==1){
                                 printf("ID(%s)\n", yytext);
                             } 
-                            num_colunas += yyleng; 
+                            num_colunas += yyleng;
+                            LOCATION;
                             yylval.str = (char *) strdup(yytext);
                             if(return_flag == 1){ 
                                 return ID;
@@ -547,6 +599,7 @@ WHITESPACE      \f|\t|" "
 
 "/*"                    {
                             parse_error = 0; 
+                            LOCATION;
                             BEGIN BLOCKCOMMENT; 
                             commentline = num_linhas; 
                             commentcol = num_colunas; 
