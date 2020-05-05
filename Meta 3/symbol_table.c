@@ -15,6 +15,7 @@ table_element *insert_class(char *id, int line, int column){
 	
 	new->column = (int) malloc(sizeof(int));
 	new->column = column;
+	new->repetido = 0;
 
 	new->next = NULL;
 
@@ -36,6 +37,8 @@ table_element * insert_fielddecl(char *id, char * type, char * param, int line, 
 	new->column = (int) malloc(sizeof(int));
 	new->column = column;
 
+	new->repetido = 0;
+
 	new->next = NULL;
 	new->vardecl = (vardecl *) malloc(sizeof(vardecl));
 
@@ -55,7 +58,8 @@ table_element * insert_fielddecl(char *id, char * type, char * param, int line, 
 	strcpy(new->vardecl->param, param);
 
 	
-	return insert_element(new, &global_table);
+	return new;
+	//return insert_element(new, &global_table);
 }
 
 table_element * insert_vardecl(char * id, char * type, char * param, table_element ** table, int line, int column) {
@@ -74,6 +78,7 @@ table_element * insert_vardecl(char * id, char * type, char * param, table_eleme
 	
 	new->column = (int) malloc(sizeof(int));
 	new->column = column;
+	new->repetido = 0;
 
 	new->vardecl = (vardecl *) malloc(sizeof(vardecl));
 	
@@ -108,14 +113,16 @@ table_element * create_funcdecl(char * id, char * type, int line, int column) {
 	
 	new->column = (int) malloc(sizeof(int));
 	new->column = column;
+	new->repetido = 0;
+
 
 	new->next = NULL;
 
 	new->funcdecl = (funcdecl *) malloc(sizeof(funcdecl));
 
-
 	new->funcdecl->n_params = 0;
 	new->funcdecl->n_params_header = 0;
+	new->funcdecl->parametros_iguais_todos = 0;
 
 	new->funcdecl->type_return = (char*) malloc(strlen(type) * sizeof(char));
 	if (strcmp(type, "bool") == 0){
@@ -190,12 +197,12 @@ void show_table(){
 	printf("===== Class %s Symbol Table =====\n", aux->id);
 	
 	while (aux != NULL){
-		if (aux->decl_type == fielddecl){
+		if (aux->decl_type == fielddecl && aux->repetido == 0){
 			// Variaveis da classe
 			printf("%s\t\t%s\n", aux->id, aux->vardecl->type);
 		}
 
-		else if (aux->decl_type == func){
+		else if (aux->decl_type == func && aux->repetido == 0){
 			// Funcao
 			if (aux->funcdecl->n_params == 0){
 				printf("%s\t()\t%s\n", aux->id, aux->funcdecl->type_return);

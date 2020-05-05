@@ -2,10 +2,7 @@
 funcao2	(String[])	void
 x	(double,int)	double
 main	(String[])	void
-main	(String[])	void
 a		boolean
-funcao3	(int,int,double)	int
-funcao3	(int,int,double)	int
 funcao3	(int,int,double)	int
 funcao3	(int,int,boolean)	boolean
 funcao		boolean
@@ -13,7 +10,6 @@ funcao	(int,double)	int
 funcao	(double,int)	void
 funcao	(double,double)	double
 funcao	(int,int)	int
-funcao		double
 maine	()	void
 ola56	(int)	int
 ola56		boolean
@@ -73,7 +69,6 @@ w		int
 ===== Method funcao(int,double) Symbol Table =====
 return		int
 i		int	param
-i		double	param
 
 ===== Method funcao(double,int) Symbol Table =====
 return		void
@@ -89,7 +84,6 @@ m		int
 
 ===== Method funcao(int,int) Symbol Table =====
 return		int
-i		int	param
 i		int	param
 
 ===== Method maine() Symbol Table =====
@@ -150,8 +144,8 @@ Program
 ........Id(d) - int
 ........DecLit(1) - int
 ......If
-........Eq - boolean
-..........Add - boolean
+........Eq - undef
+..........Add - undef
 ............Id(a) - boolean
 ............BoolLit(true) - boolean
 ..........DecLit(2) - int
@@ -336,7 +330,7 @@ Program
 ..........Id(m) - int
 ..........DecLit(1) - int
 ........Call - int
-..........Id(funcao) - (int,int)
+..........Id(funcao) - (int)
 ..........Id(m) - int
 ..........Id(m) - int
 ........Block
@@ -451,7 +445,7 @@ Program
 ......................Id(l) - boolean
 ......Assign - double
 ........Id(f) - double
-........ParseArgs - int
+........ParseArgs - undef
 ..........Id(i) - boolean
 ..........Add - double
 ............Add - double

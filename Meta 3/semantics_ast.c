@@ -39,7 +39,24 @@ void check_field_decl(struct node *node) {
 	char * value = (char*) malloc(strlen(node->childs[1]->value) * sizeof(char));
 	strcpy(value, node->childs[1]->value);
 
-	insert_fielddecl(value, type, "null", node->childs[1]->line, node->childs[1]->column);
+	table_element * new_symbol = insert_fielddecl(value, type, "null", node->childs[1]->line, node->childs[1]->column);
+
+	table_element * aux = global_table;
+
+	while(aux != NULL){
+		table_element * no = search_element(new_symbol->id, aux);
+		if(no != NULL){
+			// Se o no existe na tabela global
+			if(no->decl_type == new_symbol->decl_type)
+				if (strcmp(no->id, new_symbol->id) == 0){
+					new_symbol->repetido = 1;
+					break;
+				}
+		}
+		aux = aux->next;
+	}
+
+	insert_function(new_symbol, &global_table);
     /*table_element * novo = insert_vardecl(value, type, "null", symtab);
     if(novo == NULL){
         printf("Symbol already defined!");
@@ -78,23 +95,23 @@ void check_func_decl(struct node * node) {
 	}
  	//fazer comparacao para se ja existe
 	table_element * aux = global_table;
-	int flag = 0;
+	//int flag = 0;
 
 	while(aux != NULL){
 		table_element * no = search_element(id_function, aux);
 		if(no != NULL){
-			// Os nos sao do mesmo tipo
+			// Se o no existe na tabela global
 			if (no->decl_type == new_symbol->decl_type){
 				// Os nos sao do mesmo tipo (class, funcdecl,...)
 				if(strcmp(no->funcdecl->type_return, new_symbol->funcdecl->type_return) == 0){
 					// Os nos retornam o mesmo tipo
-					if(no->funcdecl->n_params == new_symbol->funcdecl->n_params){
-						// O nr de parametros e o mesmo
+					if(no->funcdecl->n_params_header == new_symbol->funcdecl->n_params_header){
+						// O nr de parametros do header e o mesmo
 						table_element *var_no = no->funcdecl->vars;
 						table_element *var_aux = new_symbol->funcdecl->vars;
 
 						int parametros_iguais = 0;
-						for (int i = 0; i < no->funcdecl->n_params; i++){
+						for (int i = 0; i < no->funcdecl->n_params_header; i++){
 							if (strcmp(var_no->vardecl->type, var_aux->vardecl->type) == 0){
 								parametros_iguais++;
 							}
@@ -102,9 +119,8 @@ void check_func_decl(struct node * node) {
 							var_aux = var_aux->next;
 						}
 
-						if (parametros_iguais == no->funcdecl->n_params){
-							// NAO TEMOS AQUI UM ERRO EHEHEH XD
-							flag = 1;
+						if (parametros_iguais == no->funcdecl->n_params_header){
+							new_symbol->repetido = 1; 	// Diz que e repetido os parametros de entrada
 							break;
 						}
 					}
@@ -114,11 +130,10 @@ void check_func_decl(struct node * node) {
 		aux = aux->next;
 	}
 
-
-	if(flag == 0){
-		insert_function(new_symbol, &global_table);
-		//printf("adicionei o %s \n", new_symbol->id);
-	}
+	
+	insert_function(new_symbol, &global_table);
+	//printf("adicionei o %s \n", new_symbol->id);
+	
 
 	//Parametros do Body
 	struct node *methodBody = node->childs[1];
@@ -144,7 +159,6 @@ void check_func_decl(struct node * node) {
 			continue;
 		}
 	}
-	//printf("CHEGUEI AQUI\n");
 }
 
 
@@ -257,13 +271,13 @@ void print_tree_annotated(struct node *head, int depth){
 }
 
 void add_annotation(struct node *node, char *annotation){
-	node->annotation = (char *) malloc(sizeof(char) * strlen(annotation));
+	node->annotation = (char *) malloc(sizeof(char) * (strlen(annotation) + 1));
 	strcpy(node->annotation, annotation);
 	//printf("Inseri anotacao %s -- %s\n", annotation, node->annotation);
 }
 
 void create_ast(struct node *node, table_element *table, int numero){
-	//printf("ENTREI AQUI %s   %s\n",node->type, node->value);
+	//printf("ENTREI AQUI %s (%d)   (%s)\n", node->type, numero, node->value);
 	if(strcmp(node->type, "Add") == 0 || strcmp(node->type, "Sub") == 0 || strcmp(node->type, "Mul") == 0 || strcmp(node->type, "Div") == 0 || strcmp(node->type, "Mod") == 0){
 		/*
 			aqui, mandar correr o filho0, filho1(...), verificar se anotacao dos filhos e igual
@@ -319,28 +333,37 @@ void create_ast(struct node *node, table_element *table, int numero){
 		add_annotation(node, "int");
 	}
 
-	else if(strcmp(node->type, "Id") == 0){
-		table_element * procura_id = search_element(node->value, table);
+	else if(strcmp(node->type, "Id") == 0){ //rever isto
+		/*
+			id - nome_funcao (X), nome_variavel
+			nome_variavel -> global ou local (X)
+		*/
+		table_element * procura_id = NULL;
+		if(table != global_table){
+			procura_id = search_element(node->value, table);
+		}
 		if (procura_id == NULL){
-			table_element *procura_id_global = search_element(node->value, global_table);
-			if (procura_id_global != NULL){
-				int tipo = procura_id_global->decl_type;
-				if (tipo == 1){
-					// Tipo func;
-					char * aux = (char *) malloc((strlen(procura_id_global->funcdecl->type_return) + 2) * sizeof(char));
-					strcat(aux, "(");
-					strcat(aux, procura_id_global->funcdecl->type_return);
-					strcat(aux, ")");
-					add_annotation(node, aux);
+			table_element *tabela_searching = global_table;
+			while (1){
+				table_element *procura_id_global = search_element(node->value, tabela_searching);
+				if(procura_id_global == NULL){
+					add_annotation(node, "undef");
+					break;
 				}
-				else if (tipo == 3){
+
+				int tipo = procura_id_global->decl_type;
+
+				if (tipo == 3){
 					// Tipo fielddecl
 					add_annotation(node, procura_id_global->vardecl->type);
+					break;
 				}
-			}
-			else{
-				// else - ERRO
-				add_annotation(node, "undef");
+
+				tabela_searching = procura_id_global->next;
+				if(tabela_searching == NULL){
+					add_annotation(node, "undef");
+					break;
+				}
 			}
 		}
 		else{
@@ -356,8 +379,7 @@ void create_ast(struct node *node, table_element *table, int numero){
 		}
 	}
 
-	else if(strcmp(node->type, "Return") == 0)
-	{
+	else if(strcmp(node->type, "Return") == 0){
 		create_ast(node->childs[0], table, numero);
 	}
 
@@ -486,22 +508,34 @@ void create_ast(struct node *node, table_element *table, int numero){
 	}
 	
 	else if(strcmp(node->type, "MethodDecl")== 0){
+		//printf("SKIP\n");
 		struct node *methodBody = node->childs[1];	
+		//printf("SKIP2\n");
 		table_element *no_tabela = global_table;
+		//printf("[%d] --- (%s) \t\tLOOPING UNTIL FOUND SHIT\n",no_tabela->decl_type, no_tabela->id);
+		//printf("SKIP3\n");
 		for(int i = 0; i < numero; i++){
 			if(no_tabela == NULL){
 				break;
 			}
 			no_tabela = no_tabela->next;
+			//printf("[%d] --- (%s) \t\tLOOPING UNTIL FOUND SHIT\n",no_tabela->decl_type, no_tabela->id);
 		}
+		//printf("SKIP4\n");
 		if(no_tabela != NULL){
+			//printf("SKIP5   %d     %s  \n", no_tabela->decl_type, no_tabela->id);
 			if(no_tabela->funcdecl->n_params != 0){
+				//printf("SKIP6\n");
 				table_element * var_no = no_tabela->funcdecl->vars;
 				create_ast(methodBody, var_no, numero);
 			}
 			else{
+				//printf("SKIP7\n");
 				create_ast(methodBody, global_table, numero);
 			}
+		}
+		else{
+			//printf("SKIP8\n");
 		}
 	}
 

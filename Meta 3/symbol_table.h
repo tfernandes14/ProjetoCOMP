@@ -12,8 +12,9 @@ typedef struct _t1 {
 typedef struct _t2 {
 	char * type_return;
 	struct table_element * vars;
-	int n_params;			// Nr total de parametros de uma funcao
-	int n_params_header;	// Nr total dos parametros de entrada (MethodHeader)
+	int n_params;					// Nr total de parametros de uma funcao
+	int n_params_header;			// Nr total dos parametros de entrada (MethodHeader)
+	int parametros_iguais_todos; 	//flag se esta tabela dos methods (1) ou nao (0) mexida no final do check_func_decl
 } funcdecl;
 
 typedef struct table_element {
@@ -24,6 +25,7 @@ typedef struct table_element {
 	struct table_element * next;
 	int line;
 	int column;
+	int repetido;		// Flag se esta repetido na tabela class (1) ou nao (0) , mexida no check_funcdecl e no check_fielddecl
 } table_element;
 
 table_element *insert_class(char *id, int line, int column);
