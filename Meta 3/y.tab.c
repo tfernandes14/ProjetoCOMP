@@ -2782,7 +2782,7 @@ int main(int argc, char **argv){
             create_symbol_table(head);
             show_table();
             //print_tree(head, 0);
-            create_ast(head, global_table);
+            create_ast(head, global_table, 0);
             print_tree_annotated(head, 0);
         }
 

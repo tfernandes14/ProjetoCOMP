@@ -29,4 +29,4 @@ struct node *add_bro(struct node * s1, struct node * s2);
 void print_tree(struct node *head, int depth);
 void print_tree_annotated(struct node *head, int depth);
 void add_annotation(struct node *node, char *annotation);
-void create_ast(struct node *node, table_element *table);
+void create_ast(struct node *node, table_element *table, int numero);

@@ -115,6 +115,7 @@ table_element * create_funcdecl(char * id, char * type, int line, int column) {
 
 
 	new->funcdecl->n_params = 0;
+	new->funcdecl->n_params_header = 0;
 
 	new->funcdecl->type_return = (char*) malloc(strlen(type) * sizeof(char));
 	if (strcmp(type, "bool") == 0){

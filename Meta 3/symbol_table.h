@@ -12,7 +12,8 @@ typedef struct _t1 {
 typedef struct _t2 {
 	char * type_return;
 	struct table_element * vars;
-	int n_params;
+	int n_params;			// Nr total de parametros de uma funcao
+	int n_params_header;	// Nr total dos parametros de entrada (MethodHeader)
 } funcdecl;
 
 typedef struct table_element {
