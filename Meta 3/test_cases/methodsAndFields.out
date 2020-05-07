@@ -1,3 +1,10 @@
+Line 28, col 71: Symbol e already defined
+Line 17, col 11: Symbol b already defined
+Line 18, col 4: Operator = cannot be applied to types int, boolean
+Line 21, col 10: Incompatible type int in return statement
+Line 30, col 7: Symbol a already defined
+Line 30, col 10: Symbol b already defined
+Line 30, col 19: Symbol e already defined
 ===== Class newClass Symbol Table =====
 i		int
 b		boolean
@@ -23,7 +30,6 @@ b		int	param
 c		boolean	param
 d		int
 i		int
-b		boolean
 f		double
 
 ===== Method a() Symbol Table =====
@@ -35,12 +41,8 @@ a		int	param
 b		int	param
 s		double	param
 e		boolean	param
-e		boolean	param
-a		int
-b		int
 c		int
 d		int
-e		int
 finalI		int
 
 ===== Method sum(int,int) Symbol Table =====

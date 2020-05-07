@@ -286,8 +286,19 @@ void create_ast(struct node *node, table_element *table, int numero){
 		*/
 		create_ast(node->childs[0], table, numero);
 		create_ast(node->childs[1], table, numero);
-
-		if(strcmp(node->childs[0]->annotation, node->childs[1]->annotation) == 0){
+		if(node->childs[0]->annotation == NULL){
+			add_annotation(node, "undef");
+		}
+		else if(node->childs[1]->annotation == NULL){
+			add_annotation(node, "undef");
+		}
+		else if((strcmp(node->childs[0]->annotation, "int") == 0 && strcmp(node->childs[1]->annotation, "double") == 0) || (strcmp(node->childs[0]->annotation, "double") == 0 && strcmp(node->childs[1]->annotation, "int") == 0)){
+			add_annotation(node, "double");
+		}
+		else if((strcmp(node->childs[0]->annotation, "boolean") == 0 || strcmp(node->childs[1]->annotation, "boolean") == 0)){
+			add_annotation(node, "undef");
+		}
+		else if(strcmp(node->childs[0]->annotation, node->childs[1]->annotation) == 0){
 			add_annotation(node, node->childs[0]->annotation);
 		}
 		else{
@@ -302,14 +313,17 @@ void create_ast(struct node *node, table_element *table, int numero){
 		if (node->childs[1]->annotation == NULL){
 			add_annotation(node, node->childs[0]->annotation);
 		}
-		if(strcmp(node->childs[0]->annotation, node->childs[1]->annotation) == 0){
+		else if (node->childs[0]->annotation == NULL){
+			add_annotation(node, node->childs[1]->annotation);
+		}
+		else if(strcmp(node->childs[0]->annotation, node->childs[1]->annotation) == 0){
 			add_annotation(node, node->childs[0]->annotation);
 		}
 		else if(strcmp(node->childs[1]->annotation, "undef") == 0){
 			add_annotation(node, node->childs[0]->annotation);
 		}
 		else{
-			add_annotation(node, "undef");
+			add_annotation(node, node->childs[0]->annotation);
 		}
 	}
 
@@ -445,8 +459,8 @@ void create_ast(struct node *node, table_element *table, int numero){
 							}
 							else{
 								strcat(aux_string, "(");
-								for (int i = 0; i < aux->funcdecl->n_params; i++){
-									if (i == aux->funcdecl->n_params - 1){
+								for (int i = 0; i < aux->funcdecl->n_params_header; i++){
+									if (i == aux->funcdecl->n_params_header - 1){
 										strcat(aux_string, param2->vardecl->type);
 									}
 									else{
@@ -481,17 +495,8 @@ void create_ast(struct node *node, table_element *table, int numero){
 		}
 	}
 
-	else if(strcmp(node->type, "Lshift") == 0){
-		// Lshift no Operators.java
-		create_ast(node->childs[0], table, numero);
-		create_ast(node->childs[1], table, numero);
-		add_annotation(node, node->childs[1]->annotation);
-	}
-
-	else if(strcmp(node->type, "Rshift") == 0){
-		create_ast(node->childs[0], table, numero);
-		create_ast(node->childs[1], table, numero);
-		add_annotation(node, node->childs[1]->annotation);
+	else if(strcmp(node->type, "Lshift") == 0 || strcmp(node->type, "Rshift") == 0){
+		return;
 	}
 
 	else if (strcmp(node->type, "ParamDecl") == 0){
@@ -503,39 +508,29 @@ void create_ast(struct node *node, table_element *table, int numero){
 	}
 	
 	else if(strcmp(node->type, "FieldDecl") == 0){
-		//printf("agua de coco\n");
 		return;
 	}
 	
 	else if(strcmp(node->type, "MethodDecl")== 0){
-		//printf("SKIP\n");
 		struct node *methodBody = node->childs[1];	
-		//printf("SKIP2\n");
 		table_element *no_tabela = global_table;
-		//printf("[%d] --- (%s) \t\tLOOPING UNTIL FOUND SHIT\n",no_tabela->decl_type, no_tabela->id);
-		//printf("SKIP3\n");
 		for(int i = 0; i < numero; i++){
 			if(no_tabela == NULL){
 				break;
 			}
 			no_tabela = no_tabela->next;
-			//printf("[%d] --- (%s) \t\tLOOPING UNTIL FOUND SHIT\n",no_tabela->decl_type, no_tabela->id);
 		}
-		//printf("SKIP4\n");
 		if(no_tabela != NULL){
-			//printf("SKIP5   %d     %s  \n", no_tabela->decl_type, no_tabela->id);
+			if(no_tabela->repetido == 1){
+				return;
+			}
 			if(no_tabela->funcdecl->n_params != 0){
-				//printf("SKIP6\n");
 				table_element * var_no = no_tabela->funcdecl->vars;
 				create_ast(methodBody, var_no, numero);
 			}
 			else{
-				//printf("SKIP7\n");
 				create_ast(methodBody, global_table, numero);
 			}
-		}
-		else{
-			//printf("SKIP8\n");
 		}
 	}
 
