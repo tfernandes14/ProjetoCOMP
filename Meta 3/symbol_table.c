@@ -7,7 +7,7 @@ table_element *insert_class(char *id, int line, int column){
 
 	new->decl_type = class;
 
-	new->id = (char*) malloc(strlen(id) * sizeof(char));
+	new->id = (char*) malloc((strlen(id)+1) * sizeof(char));
 	strcpy(new->id, id);
 
 	new->line = (int) malloc(sizeof(int));
@@ -28,7 +28,7 @@ table_element * insert_fielddecl(char *id, char * type, char * param, int line, 
 
 	new->decl_type = fielddecl;
 
-	new->id = (char*) malloc(strlen(id) * sizeof(char));
+	new->id = (char*) malloc((strlen(id)+1) * sizeof(char));
 	strcpy(new->id, id);
 
 	new->line = (int) malloc(sizeof(int));
@@ -42,7 +42,7 @@ table_element * insert_fielddecl(char *id, char * type, char * param, int line, 
 	new->next = NULL;
 	new->vardecl = (vardecl *) malloc(sizeof(vardecl));
 
-	new->vardecl->type = (char*) malloc(strlen(type) * sizeof(char));
+	new->vardecl->type = (char*) malloc((strlen(type)+1) * sizeof(char));
 
 	if (strcmp(type, "bool") == 0){
 		strcpy(new->vardecl->type, "boolean");
@@ -54,7 +54,7 @@ table_element * insert_fielddecl(char *id, char * type, char * param, int line, 
 		strcpy(new->vardecl->type, type);
 	}
 
-	new->vardecl->param = (char*)malloc(strlen(param)*sizeof(char));
+	new->vardecl->param = (char*)malloc((strlen(param)+1)*sizeof(char));
 	strcpy(new->vardecl->param, param);
 
 	
@@ -68,7 +68,7 @@ table_element * insert_vardecl(char * id, char * type, char * param, table_eleme
 
 	new->decl_type = var;
 
-	new->id = (char*)malloc(strlen(id)*sizeof(char));
+	new->id = (char*)malloc((strlen(id)+1)*sizeof(char));
 	strcpy(new->id, id);
     
 	new->next = NULL;
@@ -82,7 +82,7 @@ table_element * insert_vardecl(char * id, char * type, char * param, table_eleme
 
 	new->vardecl = (vardecl *) malloc(sizeof(vardecl));
 	
-	new->vardecl->type = (char*)malloc(strlen(type)*sizeof(char));
+	new->vardecl->type = (char*)malloc((strlen(type)+1)*sizeof(char));
 	if (strcmp(type, "bool") == 0){
 		strcpy(new->vardecl->type, "boolean");
 	}
@@ -93,7 +93,7 @@ table_element * insert_vardecl(char * id, char * type, char * param, table_eleme
 		strcpy(new->vardecl->type, type);
 	}
 
-	new->vardecl->param = (char*)malloc(strlen(param)*sizeof(char));
+	new->vardecl->param = (char*)malloc((strlen(param)+1)*sizeof(char));
 	strcpy(new->vardecl->param, param);
 
 	return insert_element(new, table);
@@ -105,7 +105,7 @@ table_element * create_funcdecl(char * id, char * type, int line, int column) {
 
 	new->decl_type = func;
 
-	new->id = (char*) malloc(strlen(id) * sizeof(char));
+	new->id = (char*) malloc((strlen(id)+1) * sizeof(char));
 	strcpy(new->id, id);
 
 	new->line = (int) malloc(sizeof(int));
@@ -124,7 +124,7 @@ table_element * create_funcdecl(char * id, char * type, int line, int column) {
 	new->funcdecl->n_params_header = 0;
 	new->funcdecl->parametros_iguais_todos = 0;
 
-	new->funcdecl->type_return = (char*) malloc(strlen(type) * sizeof(char));
+	new->funcdecl->type_return = (char*) malloc((strlen(type)+1) * sizeof(char));
 	if (strcmp(type, "bool") == 0){
 		strcpy(new->funcdecl->type_return, "boolean");
 	}
