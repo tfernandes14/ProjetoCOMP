@@ -2,12 +2,13 @@
 
 table_element * global_table = NULL;
 
+// Cria o no da classe (primeiro no da tabela de simbolos)
 table_element *insert_class(char *id, int line, int column){
 	table_element *new = (table_element*) malloc(sizeof(table_element));
 
 	new->decl_type = class;
 
-	new->id = (char*) malloc((strlen(id)+1) * sizeof(char));
+	new->id = (char*) malloc(strlen(id) * sizeof(char)+1);
 	strcpy(new->id, id);
 
 	new->line = (int) malloc(sizeof(int));
@@ -22,6 +23,7 @@ table_element *insert_class(char *id, int line, int column){
 	return insert_element(new, &global_table);
 }
 
+// Cria o no das variaveis globais das tabelas
 table_element * insert_fielddecl(char *id, char * type, char * param, int line, int column){
 	
 	table_element * new = (table_element*) malloc(sizeof(table_element));
@@ -59,9 +61,9 @@ table_element * insert_fielddecl(char *id, char * type, char * param, int line, 
 
 	
 	return new;
-	//return insert_element(new, &global_table);
 }
 
+// Cria o no das variaveis locais das funcoes das tabelas
 table_element * insert_vardecl(char * id, char * type, char * param, table_element ** table, int line, int column) {
 	
 	table_element * new = (table_element*) malloc(sizeof(table_element));
@@ -82,7 +84,7 @@ table_element * insert_vardecl(char * id, char * type, char * param, table_eleme
 
 	new->vardecl = (vardecl *) malloc(sizeof(vardecl));
 	
-	new->vardecl->type = (char*)malloc((strlen(type)+1)*sizeof(char));
+	new->vardecl->type = (char*)malloc(strlen(type)*sizeof(char) + 1);
 	if (strcmp(type, "bool") == 0){
 		strcpy(new->vardecl->type, "boolean");
 	}
@@ -93,12 +95,13 @@ table_element * insert_vardecl(char * id, char * type, char * param, table_eleme
 		strcpy(new->vardecl->type, type);
 	}
 
-	new->vardecl->param = (char*)malloc((strlen(param)+1)*sizeof(char));
+	new->vardecl->param = (char*)malloc(strlen(param)*sizeof(char) + 1);
 	strcpy(new->vardecl->param, param);
 
 	return insert_element(new, table);
 }
 
+// Cria o no das funcoes das tabelas
 table_element * create_funcdecl(char * id, char * type, int line, int column) {
 
 	table_element * new = (table_element*) malloc(sizeof(table_element));
@@ -124,7 +127,7 @@ table_element * create_funcdecl(char * id, char * type, int line, int column) {
 	new->funcdecl->n_params_header = 0;
 	new->funcdecl->parametros_iguais_todos = 0;
 
-	new->funcdecl->type_return = (char*) malloc((strlen(type)+1) * sizeof(char));
+	new->funcdecl->type_return = (char*) malloc(strlen(type) * sizeof(char) + 1);
 	if (strcmp(type, "bool") == 0){
 		strcpy(new->funcdecl->type_return, "boolean");
 	}
@@ -133,10 +136,10 @@ table_element * create_funcdecl(char * id, char * type, int line, int column) {
 	}
 
 	new->funcdecl->vars = NULL;
-	//return insert_element(new, &global_table);
 	return new;
 }
 
+// Insere a funcao/class/variavel global na tabela global 
 table_element * insert_function(table_element * new, table_element **table){
 	table_element * aux = *table;
 	table_element * previous;
@@ -157,11 +160,11 @@ table_element * insert_function(table_element * new, table_element **table){
 	return new;
 }
 
-
+// Insere o no das variaveis locais na sua tabela local 
 table_element * insert_element(table_element * new, table_element ** table) {
 	table_element * aux = *table;
 	table_element * previous;
-	//printf("macaquinhos (aux)\n");
+	
 	if (aux != NULL) {
 		while (aux != NULL) {
 			previous = aux;
@@ -177,33 +180,35 @@ table_element * insert_element(table_element * new, table_element ** table) {
 	return new;
 }
 
+// Procura os elementos pelo nome
 table_element * search_element(char * id, table_element * table) {
 
 	table_element * aux = table;
 
 	while (aux != NULL) {
 		
-		if (strcmp(aux->id, id) == 0) return aux; //this is the one we're searching for!
+		if (strcmp(aux->id, id) == 0) return aux;
 		aux = aux->next;
 	}
 
-	return NULL; //element not found
+	return NULL;
 }
 
+// Imprime todas as tabelas
 void show_table(){
 	table_element * aux = global_table;
 	table_element * aux2 = global_table;
 
 	printf("===== Class %s Symbol Table =====\n", aux->id);
 	
-	while (aux != NULL){
+	while (aux != NULL){ // Tabela da class
 		if (aux->decl_type == fielddecl && aux->repetido == 0){
 			// Variaveis da classe
 			printf("%s\t\t%s\n", aux->id, aux->vardecl->type);
 		}
 
 		else if (aux->decl_type == func && aux->repetido == 0){
-			// Funcao
+			// Funcoes
 			if (aux->funcdecl->n_params == 0){
 				printf("%s\t()\t%s\n", aux->id, aux->funcdecl->type_return);
 			}
@@ -231,7 +236,7 @@ void show_table(){
 	}
 	printf("\n");
 
-	while (aux2 != NULL){
+	while (aux2 != NULL){ // Tabelas de cada funcao e suas variaveis
 		if(aux2->decl_type == func){
 			table_element *func_param = aux2->funcdecl->vars;
 			printf("===== Method %s(", aux2->id);
@@ -244,7 +249,7 @@ void show_table(){
 				}
 			}
 
-			//print parametros da funcao
+			// Parametros da funcao
 			for(int i = 1; i < aux2->funcdecl->n_params; i++){
 				if(strcmp(func_param->vardecl->param, "param") == 0){
 					if (i == aux2->funcdecl->n_params - 1){
@@ -258,7 +263,7 @@ void show_table(){
 			}
 			printf(") Symbol Table =====\n");
 			
-			//print variaveis da funcao
+			// Variaveis da funcao
 			table_element *print_params = aux2->funcdecl->vars;
 			printf("return\t\t%s\n",aux2->funcdecl->type_return);
 			

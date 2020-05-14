@@ -8,15 +8,15 @@
 typedef struct node node;
 
 struct node{
-    char* type;         // Tipo da variavel (boolean, int, double)
-    char* value;        // Valor da variavel
-    struct node *dad;
-    struct node *bros;
-    struct node *childs[MAX_CHILD];
-    int index_childs;
-    char* annotation;
-    int line;
-    int column;
+    char* type;                         // Tipo da variavel (boolean, int, double)
+    char* value;                        // Valor da variavel
+    struct node *dad;                   // Variavel a mais, mas indica o pai
+    struct node *bros;                  // Variavel a mais, mas indica os irmaos
+    struct node *childs[MAX_CHILD];     // Array com os filhos (usado para dar print)
+    int index_childs;                   // Nr Total de Filhos
+    char* annotation;                   // Anotacao para a arvore anotada
+    int line;                           // Nr da linha (erros - nao estao feitos)
+    int column;                         // Nr da coluna (erros - nao estao feitos)
 };
 
 void create_symbol_table(struct node * head);
