@@ -23,6 +23,7 @@ class fluxControl1 {
 		int aux, aux1;
 		aux = 0; aux1 = 0;
 		input = Integer.parseInt(args[0]);
+		//input = 0;
 		if(input < 10) {
 			aux = a(input);
 		} else {

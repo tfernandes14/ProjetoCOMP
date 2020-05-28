@@ -6,6 +6,7 @@ class Main {
 
 
     public static int main(String[] args) {
+        System.out.print("WOW\n");
         System.out.print(test(4));
         System.out.print("\n");
         d=2;

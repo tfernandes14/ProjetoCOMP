@@ -70,7 +70,7 @@
     #include <string.h>
     #include <math.h>
     #include <unistd.h>
-    #include "semantics_ast.h"
+    #include "llvm.h"
 
     struct node *head = NULL;
 
@@ -2776,12 +2776,11 @@ int main(int argc, char **argv){
         }
 
         else if (strcmp(argv[1], "-s") == 0){
-            // Analise semantica - META 3
+            // Analise semantica - Symbol table e AST
             return_flag = 1;
             yyparse();
             create_symbol_table(head);
             show_table();
-            //print_tree(head, 0);
             create_ast(head, global_table, 0);
             print_tree_annotated(head, 0);
         }
@@ -2804,8 +2803,17 @@ int main(int argc, char **argv){
         }
     }
     if (argc == 1){
-        erros = 1;
-        yylex();
+        return_flag = 1;
+        yyparse();
+        //gera tabela analise lexical
+        create_symbol_table(head);
+        //gera analise semantica
+        create_ast(head, global_table, 0);
+        //gera codigo
+        if(error_tag == 0){
+            init_produce(head);
+            iterate_class(head, global_table);
+        }
     }
     return 0;
 }
