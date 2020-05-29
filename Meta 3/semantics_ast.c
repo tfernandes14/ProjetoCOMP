@@ -45,13 +45,25 @@ void check_field_decl(struct node *node) {
 		table_element * no = search_element(new_symbol->id, aux);
 		if(no != NULL){
 			// Se o no existe na tabela global, indicar que e repetido , de modo a evitar da print da varavel
-			if(no->decl_type == new_symbol->decl_type)
-				if (strcmp(no->id, new_symbol->id) == 0){
+			if(no->decl_type == new_symbol->decl_type) {
+				if(strcmp(no->id, new_symbol->id) == 0){
+					/*if(strcmp(new_symbol->id, "_") == 0){
+						new_symbol->repetido = 1;
+						printf("Line %d, col %d: Symbol %s is reserved\n",node->childs[1]->line, node->childs[1]->column, node->childs[1]->value);
+						break;
+					}*/
 					new_symbol->repetido = 1;
+					//printf("Line %d, col %d: Symbol %s already defined\n",node->childs[1]->line, node->childs[1]->column, node->childs[1]->value);
 					break;
 				}
+			}
 		}
 		aux = aux->next;
+	}
+
+	if(strcmp(new_symbol->id, "_") == 0 && new_symbol->repetido == 0){
+		new_symbol->repetido = 1;
+		//printf("Line %d, col %d: Symbol %s is reserved\n",new_symbol->line, new_symbol->column, new_symbol->id);
 	}
 
 	insert_function(new_symbol, &global_table);
@@ -83,6 +95,11 @@ void check_func_decl(struct node * node) {
 		char * var = (char *) malloc(sizeof(char) * (strlen(params->childs[0]->type)+1));
 		strcpy(var, params->childs[0]->type);
 		*var = tolower(*var);
+		
+		//table_element * no = search_element(params->childs[1]->value, new_symbol->funcdecl->vars);
+		/*if(no != NULL){
+			printf("Line %d, col %d: Symbol %s already defined\n",params->childs[1]->line, params->childs[1]->column, params->childs[1]->value);
+		}*/
 		insert_vardecl(params->childs[1]->value, var, "param", &(new_symbol->funcdecl->vars), params->childs[1]->line, params->childs[1]->column);
 
 		free(var);
@@ -114,16 +131,44 @@ void check_func_decl(struct node * node) {
 
 						if (parametros_iguais == no->funcdecl->n_params_header){
 							new_symbol->repetido = 1; 	// Diz que e repetido os parametros de entrada, e assim evitar dar print
+							/*printf("Line %d, col %d: Symbol %s(",new_symbol->line, new_symbol->column, new_symbol->id);
+							table_element *var_aux = new_symbol->funcdecl->vars;
+							for(int i = 0 ; i < new_symbol->funcdecl->n_params_header; i++){
+								printf("%s", var_aux->vardecl->type);
+								if(i < new_symbol->funcdecl->n_params_header - 1){
+									printf(",");
+								}
+								var_aux = var_aux->next;
+							}
+							printf(") already defined\n");*/
 							break;
 						}
 					}
 				}
 			}
+			if(no->decl_type == 3){
+				if(strcmp(new_symbol->id, no->id) == 0){
+					if(strcmp(new_symbol->id, "_") == 0){
+						new_symbol->repetido = 1;
+						/*printf("Line %d, col %d: Symbol %s(",new_symbol->line, new_symbol->column, new_symbol->id);
+						table_element *var_aux = new_symbol->funcdecl->vars;
+						for(int i = 0 ; i < new_symbol->funcdecl->n_params_header; i++){
+							printf("%s", var_aux->vardecl->type);
+							if(i == new_symbol->funcdecl->n_params_header - 1){
+								printf(",");
+							}
+							var_aux = var_aux->next;
+						}
+						printf(") already defined\n");*/
+						break;
+					}	
+				}	
+			}
 		}
 		aux = aux->next;
 	}
 	
-	insert_function(new_symbol, &global_table);	
+	insert_function(new_symbol, &global_table);
 
 	//Adiciona os parametros do Body
 	struct node *methodBody = node->childs[1];
@@ -134,7 +179,10 @@ void check_func_decl(struct node * node) {
 			char * var = (char *) malloc(sizeof(char) * (strlen(methodBody->childs[i]->childs[0]->type)+1));
 			strcpy(var, methodBody->childs[i]->childs[0]->type);
 			*var = tolower(*var);
-
+			//table_element * no = search_element(methodBody->childs[i]->childs[1]->value, new_symbol->funcdecl->vars);
+			/*if(no != NULL){
+				printf("Line %d, col %d: Symbol %s already defined\n",methodBody->childs[i]->childs[1]->line, methodBody->childs[i]->childs[1]->column, methodBody->childs[i]->childs[1]->value);
+			}*/
 			insert_vardecl(methodBody->childs[i]->childs[1]->value, var, "null", &(new_symbol->funcdecl->vars), methodBody->childs[i]->childs[1]->line, methodBody->childs[i]->childs[1]->column);
 			free(var);
 		}
@@ -276,20 +324,22 @@ void add_annotation(struct node *node, char *annotation){
 	node->annotation = (char *) malloc(sizeof(char) * strlen(annotation) + 1);
 	node->annotation = strdup(annotation);
 }
-
+int global_return = 0;
 // Cria a arvore anotada
 void create_ast(struct node *node, table_element *table, int numero){
-	if(strcmp(node->type, "Add") == 0 || strcmp(node->type, "Sub") == 0 || strcmp(node->type, "Mul") == 0 || strcmp(node->type, "Div") == 0 || strcmp(node->type, "Mod") == 0){
+	if(strcmp(node->type, "Add") == 0){
 		// Add, Sub, Mul, Div, Mod
 		create_ast(node->childs[0], table, numero);
 		create_ast(node->childs[1], table, numero);
 
 		if(node->childs[0]->annotation == NULL){
 			// Se a parte da esquerda da igualdade for NULL
+			printf("Line %d, col %d: Operator + cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
 			add_annotation(node, "undef");
 		}
 		else if(node->childs[1]->annotation == NULL){
 			// Se a parte da direita da igualdade for NULL
+			printf("Line %d, col %d: Operator + cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
 			add_annotation(node, "undef");
 		}
 		else if((strcmp(node->childs[0]->annotation, "int") == 0 && strcmp(node->childs[1]->annotation, "double") == 0) || (strcmp(node->childs[0]->annotation, "double") == 0 && strcmp(node->childs[1]->annotation, "int") == 0)){
@@ -298,6 +348,12 @@ void create_ast(struct node *node, table_element *table, int numero){
 		}
 		else if((strcmp(node->childs[0]->annotation, "boolean") == 0 || strcmp(node->childs[1]->annotation, "boolean") == 0)){
 			// Se forem os 2 "boolean"
+			printf("Line %d, col %d: Operator + cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if((strcmp(node->childs[0]->annotation, "undef") == 0 || strcmp(node->childs[1]->annotation, "undef") == 0)){
+			// Se forem os 2 "undef"
+			printf("Line %d, col %d: Operator + cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
 			add_annotation(node, "undef");
 		}
 		else if(strcmp(node->childs[0]->annotation, node->childs[1]->annotation) == 0){
@@ -305,6 +361,163 @@ void create_ast(struct node *node, table_element *table, int numero){
 			add_annotation(node, node->childs[0]->annotation);
 		}
 		else{
+			printf("Line %d, col %d: Operator + cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+	}
+
+	else if(strcmp(node->type, "Sub") == 0){
+		// Add, Sub, Mul, Div, Mod
+		create_ast(node->childs[0], table, numero);
+		create_ast(node->childs[1], table, numero);
+
+		if(node->childs[0]->annotation == NULL){
+			// Se a parte da esquerda da igualdade for NULL
+			printf("Line %d, col %d: Operator - cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if(node->childs[1]->annotation == NULL){
+			// Se a parte da direita da igualdade for NULL
+			printf("Line %d, col %d: Operator - cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if((strcmp(node->childs[0]->annotation, "int") == 0 && strcmp(node->childs[1]->annotation, "double") == 0) || (strcmp(node->childs[0]->annotation, "double") == 0 && strcmp(node->childs[1]->annotation, "int") == 0)){
+			// Se for "int" / "double" ou "double" / "int"
+			add_annotation(node, "double");
+		}
+		else if((strcmp(node->childs[0]->annotation, "boolean") == 0 || strcmp(node->childs[1]->annotation, "boolean") == 0)){
+			// Se forem os 2 "boolean"
+			printf("Line %d, col %d: Operator - cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if((strcmp(node->childs[0]->annotation, "undef") == 0 || strcmp(node->childs[1]->annotation, "undef") == 0)){
+			// Se forem os 2 "undef"
+			printf("Line %d, col %d: Operator - cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if(strcmp(node->childs[0]->annotation, node->childs[1]->annotation) == 0){
+			// Se forem os 2 iguais (exceto o caso anterior)
+			add_annotation(node, node->childs[0]->annotation);
+		}
+		else{
+			printf("Line %d, col %d: Operator - cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+	}
+
+	else if(strcmp(node->type, "Mul") == 0){
+		// Add, Sub, Mul, Div, Mod
+		create_ast(node->childs[0], table, numero);
+		create_ast(node->childs[1], table, numero);
+
+		if(node->childs[0]->annotation == NULL){
+			// Se a parte da esquerda da igualdade for NULL
+			printf("Line %d, col %d: Operator * cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if(node->childs[1]->annotation == NULL){
+			// Se a parte da direita da igualdade for NULL
+			printf("Line %d, col %d: Operator * cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if((strcmp(node->childs[0]->annotation, "int") == 0 && strcmp(node->childs[1]->annotation, "double") == 0) || (strcmp(node->childs[0]->annotation, "double") == 0 && strcmp(node->childs[1]->annotation, "int") == 0)){
+			// Se for "int" / "double" ou "double" / "int"
+			add_annotation(node, "double");
+		}
+		else if((strcmp(node->childs[0]->annotation, "boolean") == 0 || strcmp(node->childs[1]->annotation, "boolean") == 0)){
+			// Se forem os 2 "boolean"
+			printf("Line %d, col %d: Operator * cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if((strcmp(node->childs[0]->annotation, "undef") == 0 || strcmp(node->childs[1]->annotation, "undef") == 0)){
+			// Se forem os 2 "undef"
+			printf("Line %d, col %d: Operator * cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if(strcmp(node->childs[0]->annotation, node->childs[1]->annotation) == 0){
+			// Se forem os 2 iguais (exceto o caso anterior)
+			add_annotation(node, node->childs[0]->annotation);
+		}
+		else{
+			printf("Line %d, col %d: Operator * cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+	}
+
+	else if(strcmp(node->type, "Div") == 0){
+		// Add, Sub, Mul, Div, Mod
+		create_ast(node->childs[0], table, numero);
+		create_ast(node->childs[1], table, numero);
+
+		if(node->childs[0]->annotation == NULL){
+			// Se a parte da esquerda da igualdade for NULL
+			printf("Line %d, col %d: Operator / cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if(node->childs[1]->annotation == NULL){
+			// Se a parte da direita da igualdade for NULL
+			printf("Line %d, col %d: Operator / cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if((strcmp(node->childs[0]->annotation, "int") == 0 && strcmp(node->childs[1]->annotation, "double") == 0) || (strcmp(node->childs[0]->annotation, "double") == 0 && strcmp(node->childs[1]->annotation, "int") == 0)){
+			// Se for "int" / "double" ou "double" / "int"
+			add_annotation(node, "double");
+		}
+		else if((strcmp(node->childs[0]->annotation, "boolean") == 0 || strcmp(node->childs[1]->annotation, "boolean") == 0)){
+			// Se forem os 2 "boolean"
+			printf("Line %d, col %d: Operator / cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if((strcmp(node->childs[0]->annotation, "undef") == 0 || strcmp(node->childs[1]->annotation, "undef") == 0)){
+			// Se forem os 2 "undef"
+			printf("Line %d, col %d: Operator / cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if(strcmp(node->childs[0]->annotation, node->childs[1]->annotation) == 0){
+			// Se forem os 2 iguais (exceto o caso anterior)
+			add_annotation(node, node->childs[0]->annotation);
+		}
+		else{
+			printf("Line %d, col %d: Operator / cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+	}
+
+	else if(strcmp(node->type, "Mod") == 0){
+		// Add, Sub, Mul, Div, Mod
+		create_ast(node->childs[0], table, numero);
+		create_ast(node->childs[1], table, numero);
+
+		if(node->childs[0]->annotation == NULL){
+			// Se a parte da esquerda da igualdade for NULL
+			printf("Line %d, col %d: Operator %% cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if(node->childs[1]->annotation == NULL){
+			// Se a parte da direita da igualdade for NULL
+			printf("Line %d, col %d: Operator %% cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if((strcmp(node->childs[0]->annotation, "int") == 0 && strcmp(node->childs[1]->annotation, "double") == 0) || (strcmp(node->childs[0]->annotation, "double") == 0 && strcmp(node->childs[1]->annotation, "int") == 0)){
+			// Se for "int" / "double" ou "double" / "int"
+			add_annotation(node, "double");
+		}
+		else if((strcmp(node->childs[0]->annotation, "boolean") == 0 || strcmp(node->childs[1]->annotation, "boolean") == 0)){
+			// Se forem os 2 "boolean"
+			printf("Line %d, col %d: Operator %% cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if((strcmp(node->childs[0]->annotation, "undef") == 0 || strcmp(node->childs[1]->annotation, "undef") == 0)){
+			// Se forem os 2 "undef"
+			printf("Line %d, col %d: Operator %% cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			add_annotation(node, "undef");
+		}
+		else if(strcmp(node->childs[0]->annotation, node->childs[1]->annotation) == 0){
+			// Se forem os 2 iguais (exceto o caso anterior)
+			add_annotation(node, node->childs[0]->annotation);
+		}
+		else{
+			printf("Line %d, col %d: Operator %% cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
 			add_annotation(node, "undef");
 		}
 	}
@@ -315,10 +528,12 @@ void create_ast(struct node *node, table_element *table, int numero){
 
 		if (node->childs[1]->annotation == NULL){
 			// Se a parte da direita da igualdade for NULL
+			printf("Line %d, col %d: Operator = cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
 			add_annotation(node, node->childs[0]->annotation);
 		}
 		else if (node->childs[0]->annotation == NULL){
 			// Se a parte da esquerda da igualdade for NULL
+			printf("Line %d, col %d: Operator = cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
 			add_annotation(node, node->childs[1]->annotation);
 		}
 		else if(strcmp(node->childs[0]->annotation, node->childs[1]->annotation) == 0){
@@ -327,7 +542,15 @@ void create_ast(struct node *node, table_element *table, int numero){
 		}
 		else if(strcmp(node->childs[1]->annotation, "undef") == 0){
 			// Se a parte da direita da igualdade for "undef"
+			printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
 			add_annotation(node, node->childs[0]->annotation);
+		}
+		else if(strcmp(node->childs[0]->annotation, "double") == 0 && strcmp(node->childs[1]->annotation, "int") == 0){
+			add_annotation(node, "double");
+		}
+		else if(strcmp(node->childs[0]->annotation, node->childs[1]->annotation) != 0){
+			printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			add_annotation(node, "undef");
 		}
 		else{
 			add_annotation(node, node->childs[0]->annotation);
@@ -338,19 +561,161 @@ void create_ast(struct node *node, table_element *table, int numero){
 		// And, Or, Xor, Eq, Ge, Gt, Le, Lt, Ne
 		create_ast(node->childs[0], table, numero);
 		create_ast(node->childs[1], table, numero);
+
+		if (node->childs[0]->annotation == NULL){
+			if (strcmp(node->type, "And") == 0){
+				printf("Line %d, col %d: Operator && cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Or") == 0){
+				printf("Line %d, col %d: Operator || cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Xor") == 0){
+				printf("Line %d, col %d: Operator ^ cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Eq") == 0){
+				printf("Line %d, col %d: Operator == cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Ge") == 0){
+				printf("Line %d, col %d: Operator >= cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Gt") == 0){
+				printf("Line %d, col %d: Operator > cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Le") == 0){
+				printf("Line %d, col %d: Operator <= cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Lt") == 0){
+				printf("Line %d, col %d: Operator < cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Ne") == 0){
+				printf("Line %d, col %d: Operator != cannot be applied to types none, %s\n", node->line, node->column, node->childs[1]->annotation);
+			}
+		}
+		else if (node->childs[1]->annotation == NULL){
+			if (strcmp(node->type, "And") == 0){
+				printf("Line %d, col %d: Operator && cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
+			}
+			else if (strcmp(node->type, "Or") == 0){
+				printf("Line %d, col %d: Operator || cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
+			}
+			else if (strcmp(node->type, "Xor") == 0){
+				printf("Line %d, col %d: Operator ^ cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
+			}
+			else if (strcmp(node->type, "Eq") == 0){
+				printf("Line %d, col %d: Operator == cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
+			}
+			else if (strcmp(node->type, "Ge") == 0){
+				printf("Line %d, col %d: Operator >= cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
+			}
+			else if (strcmp(node->type, "Gt") == 0){
+				printf("Line %d, col %d: Operator > cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
+			}
+			else if (strcmp(node->type, "Le") == 0){
+				printf("Line %d, col %d: Operator <= cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
+			}
+			else if (strcmp(node->type, "Lt") == 0){
+				printf("Line %d, col %d: Operator < cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
+			}
+			else if (strcmp(node->type, "Ne") == 0){
+				printf("Line %d, col %d: Operator != cannot be applied to types %s, none\n", node->line, node->column, node->childs[0]->annotation);
+			}
+		}
+		else if (strcmp(node->childs[0]->annotation, "undef") == 0){
+			if (strcmp(node->type, "And") == 0){
+				printf("Line %d, col %d: Operator && cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Or") == 0){
+				printf("Line %d, col %d: Operator || cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Xor") == 0){
+				printf("Line %d, col %d: Operator ^ cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Eq") == 0){
+				printf("Line %d, col %d: Operator == cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Ge") == 0){
+				printf("Line %d, col %d: Operator >= cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Gt") == 0){
+				printf("Line %d, col %d: Operator > cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Le") == 0){
+				printf("Line %d, col %d: Operator <= cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Lt") == 0){
+				printf("Line %d, col %d: Operator < cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Ne") == 0){
+				printf("Line %d, col %d: Operator != cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+		}
+		else if (strcmp(node->childs[1]->annotation, "undef") == 0){
+			if (strcmp(node->type, "And") == 0){
+				printf("Line %d, col %d: Operator && cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Or") == 0){
+				printf("Line %d, col %d: Operator || cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Xor") == 0){
+				printf("Line %d, col %d: Operator ^ cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Eq") == 0){
+				printf("Line %d, col %d: Operator == cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Ge") == 0){
+				printf("Line %d, col %d: Operator >= cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Gt") == 0){
+				printf("Line %d, col %d: Operator > cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Le") == 0){
+				printf("Line %d, col %d: Operator <= cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Lt") == 0){
+				printf("Line %d, col %d: Operator < cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+			else if (strcmp(node->type, "Ne") == 0){
+				printf("Line %d, col %d: Operator != cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+			}
+		}
 		
 		add_annotation(node, "boolean");
 	}
 
-	else if(strcmp(node->type, "Not") == 0 || strcmp(node->type, "Minus") == 0 || strcmp(node->type, "Plus") == 0){
+	else if(strcmp(node->type, "Not") == 0){
 		create_ast(node->childs[0], table,numero);
-		add_annotation(node, node->childs[0]->annotation);
+		if (strcmp(node->childs[0]->annotation, "boolean") == 0){
+			add_annotation(node, node->childs[0]->annotation);
+		}
+		else{
+			printf("Line %d, col %d: Operator ! cannot be applied to type %s\n", node->line, node->column, node->childs[0]->annotation);
+			add_annotation(node, "undef");
+		}
+	}
+
+	else if(strcmp(node->type, "Minus") == 0 || strcmp(node->type, "Plus") == 0){
+		create_ast(node->childs[0], table,numero);
+		if (strcmp(node->childs[0]->annotation, "boolean") == 0){
+			if (strcmp(node->type, "Minus") == 0){
+				printf("Line %d, col %d: Operator - cannot be applied to type %s\n", node->line, node->column, node->childs[0]->annotation);
+			}
+			else if (strcmp(node->type, "Plus") == 0){
+				printf("Line %d, col %d: Operator + cannot be applied to type %s\n", node->line, node->column, node->childs[0]->annotation);
+			}
+			add_annotation(node, "undef");
+		}
+		else{
+			add_annotation(node, node->childs[0]->annotation);
+		}
 	}
 
 	else if (strcmp(node->type, "ParseArgs") == 0){
 		//manda correr os filhos, e adiciona anotacao int
-		create_ast(node->childs[0], table,numero);
-		create_ast(node->childs[1], table,numero);
+		create_ast(node->childs[0], table, numero);
+		create_ast(node->childs[1], table, numero);
+		if (strcmp(node->childs[0]->annotation, "String[]") != 0 || strcmp(node->childs[1]->annotation, "int") != 0){
+			printf("Line %d, col %d: Operator Integer.parseInt cannot be applied to types %s, %s\n", node->line, node->column, node->childs[0]->annotation, node->childs[1]->annotation);
+		}
 		add_annotation(node, "int");
 	}
 
@@ -369,6 +734,7 @@ void create_ast(struct node *node, table_element *table, int numero){
 			while (1){
 				table_element *procura_id_global = search_element(node->value, tabela_searching);
 				if(procura_id_global == NULL){
+					printf("Line %d, col %d: Cannot find symbol %s\n", node->line, node->column, node->value);
 					add_annotation(node, "undef");
 					break;
 				}
@@ -383,6 +749,7 @@ void create_ast(struct node *node, table_element *table, int numero){
 
 				tabela_searching = procura_id_global->next;
 				if(tabela_searching == NULL){
+					printf("Line %d, col %d: Cannot find symbol %s\n", node->line, node->column, node->value);
 					add_annotation(node, "undef");
 					break;
 				}
@@ -400,6 +767,7 @@ void create_ast(struct node *node, table_element *table, int numero){
 				while (1){
 					table_element *procura_id_global = search_element(node->value, tabela_searching);
 					if(procura_id_global == NULL){
+						printf("Line %d, col %d: Cannot find symbol %s\n", node->line, node->column, node->value);
 						add_annotation(node, "undef");
 						break;
 					}
@@ -414,6 +782,7 @@ void create_ast(struct node *node, table_element *table, int numero){
 
 					tabela_searching = procura_id_global->next;
 					if(tabela_searching == NULL){
+						printf("Line %d, col %d: Cannot find symbol %s\n", node->line, node->column, node->value);
 						add_annotation(node, "undef");
 						break;
 					}
@@ -423,8 +792,25 @@ void create_ast(struct node *node, table_element *table, int numero){
 	}
 
 	else if(strcmp(node->type, "Return") == 0){
+		// Falta ver se a funcao retornar um int e dps nao retornar nada
+		if(node->index_childs == 0 && global_return != 4){
+			printf("Line %d, col %d: Incompatible type void in return statement\n", node->line, node->column);
+		}
+
 		if (node->index_childs != 0){
 			create_ast(node->childs[0], table, numero);
+			if(global_return == 4){
+				printf("Line %d, col %d: Incompatible type %s in return statement\n", node->childs[0]->line, node->childs[0]->column, node->childs[0]->annotation);
+			}
+			else if(strcmp(node->childs[0]->annotation, "int") == 0 && global_return != 2){
+				printf("Line %d, col %d: Incompatible type %s in return statement\n", node->childs[0]->line, node->childs[0]->column, node->childs[0]->annotation);
+			}
+			else if(strcmp(node->childs[0]->annotation, "double") == 0 && (global_return == 4 || global_return == 1)){
+				printf("Line %d, col %d: Incompatible type %s in return statement\n", node->childs[0]->line, node->childs[0]->column, node->childs[0]->annotation);				
+			}
+			else if(strcmp(node->childs[0]->annotation, "boolean") == 0 && global_return != 1){
+				printf("Line %d, col %d: Incompatible type %s in return statement\n", node->childs[0]->line, node->childs[0]->column, node->childs[0]->annotation);
+			}
 		}
 		else{
 			return;
@@ -433,6 +819,9 @@ void create_ast(struct node *node, table_element *table, int numero){
 
 	else if(strcmp(node->type, "Length") == 0){
 		create_ast(node->childs[0], table, numero);
+		if (strcmp(node->childs[0]->annotation, "String[]") != 0){
+			printf("Line %d, col %d: Operator .length cannot be applied to type %s\n", node->line, node->column, node->childs[0]->annotation);
+		}
 		add_annotation(node, "int");
 	}
 
@@ -480,13 +869,6 @@ void create_ast(struct node *node, table_element *table, int numero){
 						if(contador == aux->funcdecl->n_params_header){
 							// Verifica se todas as variaveis sao do mesmo tipo
 							table_element * param2 = aux->funcdecl->vars;
-							/*int tam = 0;
-							int quantos = 0;
-							table_element * aux_tamanho = aux->funcdecl->vars;
-							for (int i = 0; i < aux->funcdecl->n_params_header; i++){
-								tam += strlen(aux_tamanho->vardecl->type);
-								quantos++;
-							}*/
 
 							if (aux->funcdecl->n_params_header == 0){
 								// Se nao tiver parametros adiciona anotacao "()"
@@ -536,6 +918,14 @@ void create_ast(struct node *node, table_element *table, int numero){
 			while(1){ // Corre todos os elementos com mesmo nome a procura da funcao com os mesmos parametros
 				table_element *aux = search_element(node->childs[0]->value, tabela_searching_v2);
 				if(aux == NULL){
+					printf("Line %d, col %d: Cannot find symbol %s(", node->line, node->column, node->childs[0]->value);
+					for (int u = 1; u < node->index_childs; u++){
+						printf("%s", node->childs[u]->annotation);
+						if( u < node->index_childs - 1){
+							printf(",");
+						}
+					}
+					printf(")\n");
 					add_annotation(node->childs[0], "undef");
 					add_annotation(node, "undef");
 					break;
@@ -559,13 +949,6 @@ void create_ast(struct node *node, table_element *table, int numero){
 							if(contador == aux->funcdecl->n_params_header){
 								// Verifica se todas as variaveis sao do mesmo tipo
 								table_element * param2 = aux->funcdecl->vars;
-								/*int tam = 0;
-								int quantos = 0;
-								table_element * aux_tamanho = aux->funcdecl->vars;
-								for (int i = 0; i < aux->funcdecl->n_params; i++){
-									tam += strlen(aux_tamanho->vardecl->type);
-									quantos++;
-								}*/
 								if (aux->funcdecl->n_params_header == 0){
 									add_annotation(node->childs[0], "()");
 									add_annotation(node, aux->funcdecl->type_return);
@@ -600,6 +983,14 @@ void create_ast(struct node *node, table_element *table, int numero){
 				}	
 				tabela_searching_v2 = aux->next;
 				if(tabela_searching_v2 == NULL){
+					printf("Line %d, col %d: Cannot find symbol %s()\n", node->line, node->column, node->childs[0]->value);
+					for (int u = 1; u < node->index_childs; u++){
+						printf("%s", node->childs[u]->annotation);
+						if( u < node->index_childs - 1){
+							printf(",");
+						}
+					}
+					printf(")\n");
 					add_annotation(node->childs[0], "undef");
 					add_annotation(node, "undef");
 					break;
@@ -614,6 +1005,19 @@ void create_ast(struct node *node, table_element *table, int numero){
 	}
 	
 	else if(strcmp(node->type, "MethodDecl")== 0){
+		if(strcmp(node->childs[0]->childs[0]->type,"Bool") == 0){
+			global_return = 1;
+		}
+		else if(strcmp(node->childs[0]->childs[0]->type,"Int") == 0){
+			global_return = 2;
+		}
+		else if(strcmp(node->childs[0]->childs[0]->type,"Double") == 0){
+			global_return = 3;
+		}
+		else if(strcmp(node->childs[0]->childs[0]->type,"Void") == 0){
+			global_return = 4;
+		}
+		//printf("%d\n",global_return);
 		struct node *methodBody = node->childs[1];	
 		table_element *no_tabela = global_table;
 		//da skip na tabela global ate encontrar o seu no correspondente
@@ -636,6 +1040,15 @@ void create_ast(struct node *node, table_element *table, int numero){
 				//caso seja uma funcao sem parametros proprios/ usa variaveis globais, manda a tabela global aos filhos
 				create_ast(methodBody, global_table, numero);
 			}
+		}
+	}
+
+	else if (strcmp(node->type, "Print") == 0){
+		for(int i = 0; i < node->index_childs; i++){
+			create_ast(node->childs[i], table, numero);
+		}
+		if (strcmp(node->childs[0]->annotation, "undef") == 0){
+			printf("Line %d, col %d: Incompatible type %s in System.out.print statement\n", node->line, node->column, node->childs[0]->annotation);
 		}
 	}
 

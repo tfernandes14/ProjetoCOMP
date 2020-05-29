@@ -36,9 +36,12 @@ table_element *insert_func(table_element *new, table_element **table);
 table_element * insert_function(table_element * new, table_element **table);
 table_element * insert_element(table_element * new_symbol, table_element ** table);
 table_element * search_element(char * identifier, table_element * table);
+table_element * search_repetidos(char *id , table_element *inicio, int index, int type);
+table_element * search_funcao_repetidos(table_element *no , table_element *inicio, int index);
 
 void show_table();
 void free_table(table_element * table);
+void imprime_erros();
 
 extern table_element * global_table;
 
