@@ -65,7 +65,6 @@ void check_field_decl(struct node *node) {
 		new_symbol->repetido = 1;
 		//printf("Line %d, col %d: Symbol %s is reserved\n",new_symbol->line, new_symbol->column, new_symbol->id);
 	}
-
 	insert_function(new_symbol, &global_table);
 	free(type);
 	free(value);
@@ -324,6 +323,7 @@ void add_annotation(struct node *node, char *annotation){
 	node->annotation = (char *) malloc(sizeof(char) * strlen(annotation) + 1);
 	node->annotation = strdup(annotation);
 }
+
 int global_return = 0;
 // Cria a arvore anotada
 void create_ast(struct node *node, table_element *table, int numero){
