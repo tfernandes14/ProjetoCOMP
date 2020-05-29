@@ -5,6 +5,7 @@
 #include "semantics_ast.h"
 
 void create_main();
+void create_entry();
 void init_produce(struct node *node);
 void print_search_strlits(struct node *node);
 void iterate_class(struct node *node, table_element *table);

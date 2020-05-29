@@ -24,5 +24,5 @@ store i8** %.args, i8*** %args
 %.11 = call i32 (i8*, ...) @printf(i8* getelementptr ([6 x i8], [6 x i8]* @.str.double, i32 0, i32 0), double %.10)
 %.12 = call i32 (i8*, ...) @printf(i8* getelementptr ([2 x i8], [2 x i8]* @.str.2, i32 0, i32 0))
 %.13 = call i32 (i8*, ...) @printf(i8* getelementptr ([10 x i8], [10 x i8]* @.str.3, i32 0, i32 0))
-ret void 
+ret void
 }

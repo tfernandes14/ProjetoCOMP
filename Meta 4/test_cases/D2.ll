@@ -4,8 +4,9 @@ declare i32 @atoi(i8*)
 @.str.false = constant [6 x i8] c"false\00"
 @.str.int = constant [3 x i8] c"%d\00"
 @.str.double = constant [6 x i8] c"%.16e\00"
-define void @main(i32,i8** %.args) {
-%args = alloca i8**
+define void @main.entry(i32 %.size.,i8** %.args) {
+%size. = alloca i32
+store i32 %.size., i32* %size.%args = alloca i8**
 store i8** %.args, i8*** %args
 %i = alloca i32
 %.1 = add i32 0, 3
@@ -26,5 +27,9 @@ store double %.7, double* %j
 store double %.11, double* %j
 %.12 = load double , double* %j
 %.13 = call i32 (i8*, ...) @printf(i8* getelementptr ([6 x i8], [6 x i8]* @.str.double, i32 0, i32 0), double %.12)
-ret void 
+ret void
+}
+define i32 @main(i32 %.size,i8** %.args){
+call void @main.entry(i32 %.size, i8** %.args)
+ret i32 0
 }
