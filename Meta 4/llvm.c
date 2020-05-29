@@ -5,6 +5,7 @@ int while_incrementa = 1;
 int incrementa;
 int string_valor;
 int main_contador = 0;
+int entry = 0;
 
 
 void iterate_class(struct node *node, table_element *table){
@@ -17,6 +18,9 @@ void iterate_class(struct node *node, table_element *table){
         for(int i = 1; i < node->index_childs; i++){
             iterate_class(node->childs[i],aux);
             aux = aux->next;
+        }
+        if(entry == 1){
+            create_entry();
         }
         if(main_contador == 0){
             create_main();
@@ -46,6 +50,13 @@ void create_main(){
     printf("define i32 @main(i32,i8** %%.args){\n");
     printf("%%args = alloca i8**\n");
     printf("store i8** %%.args, i8*** %%args\n");
+    printf("ret i32 0\n");
+    printf("}\n");
+}
+
+void create_entry(){
+    printf("define i32 @main(i32 %%.size,i8** %%.args){\n");
+    printf("call void @main.entry(i32 %%.size, i8** %%.args)\n");
     printf("ret i32 0\n");
     printf("}\n");
 }
@@ -105,7 +116,8 @@ void create_func(struct node *node){
 
     else if(strcmp(node->childs[0]->type, "Void") == 0){
         if(strcmp(node->childs[1]->value, "main") == 0){
-            printf("define void @%s", node->childs[1]->value);
+            printf("define void @%s.entry", node->childs[1]->value);
+            entry = 1;
         }else{
             printf("define void @method_%s_void", node->childs[1]->value);
         }
@@ -146,7 +158,7 @@ void create_func(struct node *node){
             printf("double %%.%s", param_decl->childs[1]->value);
         }
         else if(strcmp(param_decl->childs[0]->type, "StringArray") == 0){
-            printf("i32,i8** %%.%s", param_decl->childs[1]->value);
+            printf("i32 %%.size.,i8** %%.%s", param_decl->childs[1]->value);
         }
         if(i < methodparams->index_childs - 1){
             printf(",");
@@ -175,6 +187,8 @@ void create_func(struct node *node){
             */
         }
         else if(strcmp(param_decl->childs[0]->type, "StringArray") == 0){
+            printf("%%size. = alloca i32\n");
+            printf("store i32 %%.size., i32* %%size.");
             printf("%%%s = alloca i8**\n", param_decl->childs[1]->value);
             printf("store i8** %%.%s, i8*** %%%s\n",param_decl->childs[1]->value,param_decl->childs[1]->value);
             /*
@@ -657,8 +671,10 @@ void create_return(struct node *node){
         printf("ret i1 0\n");
     }
     else if(strcmp(node->childs[0]->type,"Void") == 0){
-        printf("ret void \n");
-    }
+        printf("ret void\n");
+    }/*else{
+        printf("ret void 0\n");
+    }*/
 }
 
 void create_expressions(struct node *node, table_element *table){
@@ -1137,6 +1153,7 @@ void create_expressions(struct node *node, table_element *table){
                 j++;
             }
         }
+        aux_string[j] = '\0';
         //printf("\n%s\n",aux_string);
         printf("%%.%d = add i32 0, %s\n", incrementa, aux_string);
         free(aux_string);
