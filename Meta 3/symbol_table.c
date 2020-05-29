@@ -194,6 +194,131 @@ table_element * search_element(char * id, table_element * table) {
 	return NULL;
 }
 
+table_element * search_repetidos(char *id , table_element *inicio, int index, int type){
+	table_element * aux = inicio;
+
+	for(int i = 0 ; i < index; i++){
+		if(strcmp(aux->id, id) == 0 && aux->decl_type == type) return aux;
+		aux = aux->next;
+	}
+	return NULL;
+}
+
+table_element * search_funcao_repetidos(table_element *no , table_element *inicio, int index){
+	table_element * aux = inicio;
+
+	for(int i = 0 ; i < index; i++){
+	//	printf("%s search\n", aux->id);
+		if(aux->decl_type == 1){
+			if(strcmp(aux->funcdecl->type_return, no->funcdecl->type_return) == 0 && strcmp(aux->id, no->id) == 0){
+				if(aux->funcdecl->n_params_header == no->funcdecl->n_params_header){
+					int conta = 0;
+
+					table_element *var_no = no->funcdecl->vars;
+					table_element *var_aux = aux->funcdecl->vars;
+
+					for (int i = 0; i < no->funcdecl->n_params_header; i++){
+						if (strcmp(var_no->vardecl->type, var_aux->vardecl->type) == 0){
+							conta++;
+						}
+						var_no = var_no->next;
+						var_aux = var_aux->next;
+					}
+					if(conta == no->funcdecl->n_params_header){
+						//printf("YEAH %d\n",i);
+						return aux;
+					}
+				}
+			}
+		}
+		aux = aux->next;
+	}
+	return NULL;
+}
+
+
+void imprime_erros(){
+	table_element * aux = global_table;
+	table_element * aux2 = global_table;
+	int k = 0;
+	//int conta = 0;
+
+	while(aux != NULL){
+		if(aux->decl_type == func){
+			table_element *tabela = aux->funcdecl->vars;
+			table_element *vars_table = aux->funcdecl->vars;
+			for(int i = 0 ; i < aux->funcdecl->n_params_header; i++){
+				table_element *procura_var = search_repetidos(vars_table->id, tabela, i, 0);
+				if(procura_var != NULL){
+					if(strcmp(procura_var->id, "_") == 0){
+						printf("Line %d, col %d: Symbol _ is reserved\n",vars_table->line, vars_table->column);
+					}
+					else{printf("Line %d, col %d: Symbol %s already defined\n",vars_table->line, vars_table->column, vars_table->id);}
+				}
+				else{
+					if(strcmp(vars_table->id, "_") == 0){
+						printf("Line %d, col %d: Symbol _ is reserved\n",vars_table->line, vars_table->column);
+					}
+				}
+				vars_table = vars_table->next;
+			}
+			table_element *procura = search_funcao_repetidos(aux, global_table, k);
+			if(procura != NULL){
+				printf("Line %d, col %d: Symbol %s(",aux->line, aux->column, aux->id);
+				table_element *var_aux = aux->funcdecl->vars;
+				for(int i = 0 ; i < aux->funcdecl->n_params_header; i++){
+					printf("%s", var_aux->vardecl->type);
+					if(i < aux->funcdecl->n_params_header - 1){
+						printf(",");
+					}
+					var_aux = var_aux->next;
+				}
+				printf(") already defined\n");
+			}
+		}
+		else if(aux->decl_type == fielddecl){
+			table_element *procura_field = search_repetidos(aux->id, global_table, k, 3);
+			if(procura_field != NULL){
+				if(strcmp(procura_field->id, "_") == 0){
+					printf("Line %d, col %d: Symbol _ is reserved\n",aux->line, aux->column);
+				}
+				else{
+					printf("Line %d, col %d: Symbol %s already defined\n",aux->line, aux->column, aux->id);
+				}
+			}
+			else{
+				if(strcmp(aux->id, "_") == 0){
+					printf("Line %d, col %d: Symbol _ is reserved\n",aux->line, aux->column);
+				}
+			}
+		}
+		aux = aux->next;
+		k++;
+	}
+
+	while(aux2 != NULL){
+		if(aux2->decl_type == func){
+			table_element * table_vars = aux2->funcdecl->vars;
+			table_element * vars = aux2->funcdecl->vars;
+			int search = aux2->funcdecl->n_params;
+			int numero = aux2->funcdecl->n_params_header;
+			for(int i = 0 ; i < search ; i++){
+				table_element *procura_var = search_repetidos(vars->id, table_vars, i, 0);
+				if(i > numero){
+					if(procura_var != NULL){
+						if(strcmp(procura_var->id, "_") == 0){
+							printf("Line %d, col %d: Symbol _ is reserved\n",vars->line, vars->column);
+						}
+						else{printf("Line %d, col %d: Symbol %s already defined\n",vars->line, vars->column, vars->id);}
+					}
+				}
+				vars = vars->next;
+			}
+		}
+		aux2 = aux2->next;
+	}
+}//falta so casos de _
+
 // Imprime todas as tabelas
 void show_table(){
 	table_element * aux = global_table;
