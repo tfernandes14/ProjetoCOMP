@@ -6,7 +6,7 @@ int incrementa;
 int string_valor;
 int main_contador = 0;
 int entry = 0;
-
+int tipo_func = 0; // 1- int, 2 - double
 
 void iterate_class(struct node *node, table_element *table){
       //printf("Entrei Class\n");
@@ -27,6 +27,7 @@ void iterate_class(struct node *node, table_element *table){
         }
     }
     else if((strcmp(node->type, "MethodDecl") == 0)){ //filhos MethodHeader(params) and MethodBody(variaveis)
+        tipo_func = 0;
         create_func(node->childs[0]);//methodHeader cria func
         incrementa = 1;
         if(table->funcdecl->n_params != 0){
@@ -89,6 +90,7 @@ void create_func(struct node *node){
       //0 type, 1 id, 2 methodsparams-> filhos sao paramdecls->childs0-type childs1id
     int main_found = 0;
     if(strcmp(node->childs[0]->type, "Int") == 0){
+        tipo_func = 1;
         if(strcmp(node->childs[1]->value, "main") == 0){
             printf("define i32 @%s", node->childs[1]->value);
         }
@@ -107,6 +109,7 @@ void create_func(struct node *node){
     }
 
     else if(strcmp(node->childs[0]->type, "Double") == 0){
+        tipo_func = 2;
         if(strcmp(node->childs[1]->value, "main") == 0){
             printf("define double @%s", node->childs[1]->value);
         }else{
@@ -224,17 +227,12 @@ void create_methodbody(struct node *node, table_element *table){
 }
 
 void create_statements(struct node *node, table_element *table){
-      //printf("Entrei statement\n");
     struct node *aux = node;
     if (strcmp(aux->type, "Assign") == 0){//filho0 = id; filho 1 -> expr 
         create_expressions(aux->childs[1], table);
         //usar a tabela para ver qual tipo do id
         if(strcmp(aux->annotation, "int") == 0){
             //expressions podem ser int, double 
-            if(strcmp(aux->childs[1]->annotation, "double")==0){
-                printf("%%.%d = fptosi double %%.%d to i32\n",incrementa, incrementa-1);
-                incrementa++;
-            }
             if(!verifica_local(aux->childs[0], table) && verifica_global(aux->childs[0])){
                 printf("store i32 %%.%d, i32* @%s_int\n",incrementa-1,aux->childs[0]->value);
                 //incrementa++;
@@ -242,19 +240,9 @@ void create_statements(struct node *node, table_element *table){
                 printf("store i32 %%.%d, i32* %%%s\n",incrementa-1,aux->childs[0]->value);
                //incrementa++;
             }
-            //printf("store i32 %%.%d, i32* %%%s\n",incrementa-1,aux->childs[0]->value);
-            //incrementa++;
-            //se filho for global
-            //printf("store i32 %%.%d, i32* @%s",incrementa-1,aux->childs[1]->value);
         }
         else if(strcmp(aux->childs[0]->annotation, "double") == 0){
-            /*
-                %j = alloca double
-                %.2 = add i32 0, 4 //tratado nos statements
-                %.3 = sitofp i32 %.2 to double
-                store double %.3, double* %j
-            */
-            //expressions podem ser int, double 
+
             if(strcmp(aux->childs[1]->annotation, "int")==0){
                 printf("%%.%d = sitofp i32 %%.%d to double\n",incrementa, incrementa-1);
                 incrementa++;
@@ -266,10 +254,6 @@ void create_statements(struct node *node, table_element *table){
                 printf("store double %%.%d, double* %%%s\n",incrementa-1,aux->childs[0]->value);
                 //incrementa++;
             }
-            //printf("store double %%.%d, double* %%%s\n",incrementa-1,aux->childs[0]->value);
-            //incrementa++;
-            //se filho for global
-            //printf("store double %%.%d, double* @%s",incrementa-1,aux->childs[1]->value);
         }
         else if(strcmp(aux->childs[0]->annotation, "boolean") == 0){
             if(!verifica_local(aux->childs[0], table) && verifica_global(aux->childs[0])){
@@ -279,16 +263,9 @@ void create_statements(struct node *node, table_element *table){
                 printf("store i1 %%.%d, i1* %%%s\n",incrementa-1,aux->childs[0]->value);
                 //incrementa++;
             }
-            //printf("store i1 %%.%d, i1* %%%s\n",incrementa-1,aux->childs[0]->value);
         }
     }
     else if (strcmp(aux->type, "Call") == 0){//filho0 =id, restantes filhos sao expr
-        //percorrer os filhos para obter o nomecompleto
-        /*
-            %.1 = add i32 0, 4
-            %.2 = sitofp i32 %.1 to double
-            %.3 = call double @method_test_0(double %.2)
-        */
         if(aux->index_childs > 1){
             int array[aux->index_childs];
             for(int i = 1; i < aux->index_childs;i++){
@@ -301,11 +278,8 @@ void create_statements(struct node *node, table_element *table){
             char * aux_string = (char *)malloc((tamanho) * sizeof(char *));
             int conta = 0;
             int array_ind = 1;
-            //annotacao (double,int)//memset(&arr[0], 0, sizeof(arr));
             for(int i = 1 ; i < tamanho-1;i++){
-                //printf("\n%c\n",aux->childs[0]->annotation[i]);
                 if(aux->childs[0]->annotation[i] == ','){
-                    //printf("_%s",aux_string);
                     if(aux->childs[array_ind]->annotation == NULL){
                         if(strcmp(aux->childs[array_ind]->type, "DecLit") == 0){
                             if(strcmp(aux_string, "double") == 0){
@@ -401,7 +375,10 @@ void create_statements(struct node *node, table_element *table){
             for(int i = 1 ; i < tamanho-1;i++){
                 //printf("\n%c\n",aux->childs[0]->annotation[i]);
                 if(aux->childs[0]->annotation[i] == ','){
-                    printf("_%s",aux_string);
+                    if(strcmp(aux_string, "String[]") == 0){
+                        printf("_string");
+                    }
+                    else{printf("_%s",aux_string);}
                     conta = 0;
                     memset(&aux_string[0], 0, sizeof(aux_string));
 
@@ -410,7 +387,10 @@ void create_statements(struct node *node, table_element *table){
                     conta++;
                 }
             }
-            printf("_%s",aux_string);
+            if(strcmp(aux_string, "String[]") == 0){
+                printf("_string");
+            }
+            else{printf("_%s",aux_string);}
             printf("(");
             memset(&aux_string[0], 0, sizeof(aux_string));
             conta = 0;
@@ -426,6 +406,10 @@ void create_statements(struct node *node, table_element *table){
                         array_ind++;
                     }else if(strcmp(aux_string, "boolean") == 0){
                         printf("i1 %%.%d",array[array_ind-1]);
+                        array_ind++;
+                    }
+                    else if(strcmp(aux_string, "String[]") == 0){
+                        printf("i32 %%.size.,i8** %%.%d",array[array_ind-1]);
                         array_ind++;
                     }
                     printf(",");
@@ -445,6 +429,10 @@ void create_statements(struct node *node, table_element *table){
             }else if(strcmp(aux_string, "boolean") == 0){
                 printf("i1 %%.%d",array[array_ind-1]);
                 array_ind++;            
+            }
+            else if(strcmp(aux_string, "String[]") == 0){
+                printf("i32 %%.size.,i8** %%.%d",array[array_ind-1]);
+                array_ind++;
             }
             free(aux_string);
             printf(")\n");
@@ -585,7 +573,7 @@ void create_statements(struct node *node, table_element *table){
                             j++;
                             i++;
                         }
-                        else if(node->childs[0]->value[i+1] == '\"'){
+                        else if(node->childs[0]->value[i+1] == '"'){
                             aux_string[j] = '2';
                             j++;
                             aux_string[j] = '2';
@@ -615,7 +603,41 @@ void create_statements(struct node *node, table_element *table){
             }
         }else{
             create_expressions(aux->childs[0], table);
-            if(strcmp(aux->childs[0]->annotation,"int") == 0){
+            if(strcmp(aux->childs[0]->type,"Lshift") == 0 || strcmp(aux->childs[0]->type,"Rshift") == 0){
+                if(strcmp(aux->childs[0]->childs[0]->type, "DecLit") == 0 && strcmp(aux->childs[0]->childs[1]->type, "DecLit") == 0){
+                   printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr ([3 x i8], [3 x i8]* @.str.int, i32 0, i32 0), i32 %%.%d)\n",incrementa,incrementa-1);
+                    incrementa++;
+                }
+                else if(strcmp(aux->childs[0]->childs[0]->type, "RealLit") == 0 && strcmp(aux->childs[0]->childs[1]->type, "RealLit") == 0){
+                   printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr ([6 x i8], [6 x i8]* @.str.double, i32 0, i32 0), double %%.%d)\n",incrementa,incrementa-1);
+                    incrementa++;
+                }
+                else if(strcmp(aux->childs[0]->childs[0]->type, "DecLit") == 0 && strcmp(aux->childs[0]->childs[1]->type, "RealLit") == 0){
+                   printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr ([6 x i8], [6 x i8]* @.str.double, i32 0, i32 0), double %%.%d)\n",incrementa,incrementa-1);
+                    incrementa++;
+                }
+                else if(strcmp(aux->childs[0]->childs[0]->type, "RealLit") == 0 && strcmp(aux->childs[0]->childs[1]->type, "DecLit") == 0){
+                    printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr ([6 x i8], [6 x i8]* @.str.double, i32 0, i32 0), double %%.%d)\n",incrementa,incrementa-1);
+                    incrementa++;
+                }
+                else if(strcmp(aux->childs[0]->childs[0]->annotation, "int") == 0 && strcmp(aux->childs[0]->childs[1]->annotation, "double") == 0){
+                    printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr ([6 x i8], [6 x i8]* @.str.double, i32 0, i32 0), double %%.%d)\n",incrementa,incrementa-1);
+                    incrementa++;
+                }
+                else if(strcmp(aux->childs[0]->childs[0]->annotation, "double") == 0 && strcmp(aux->childs[0]->childs[1]->annotation, "int") == 0){
+                    printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr ([6 x i8], [6 x i8]* @.str.double, i32 0, i32 0), double %%.%d)\n",incrementa,incrementa-1);
+                    incrementa++;
+                }
+                else if(strcmp(aux->childs[0]->childs[0]->annotation, "double") == 0 && strcmp(aux->childs[0]->childs[1]->annotation, "double") == 0){
+                   printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr ([6 x i8], [6 x i8]* @.str.double, i32 0, i32 0), double %%.%d)\n",incrementa,incrementa-1);
+                    incrementa++;
+                }
+                else if(strcmp(aux->childs[0]->childs[0]->annotation, "int") == 0 && strcmp(aux->childs[0]->childs[1]->annotation, "int") == 0){
+                     printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr ([3 x i8], [3 x i8]* @.str.int, i32 0, i32 0), i32 %%.%d)\n",incrementa,incrementa-1);
+                    incrementa++;
+                }
+            }
+            else if(strcmp(aux->childs[0]->annotation,"int") == 0){
                 printf("%%.%d = call i32 (i8*, ...) @printf(i8* getelementptr ([3 x i8], [3 x i8]* @.str.int, i32 0, i32 0), i32 %%.%d)\n",incrementa,incrementa-1);
                 incrementa++;
             }
@@ -643,7 +665,13 @@ void create_statements(struct node *node, table_element *table){
         if(aux->index_childs > 0){
             create_expressions(aux->childs[0], table);
             if(strcmp(aux->childs[0]->annotation, "int") == 0){
-                printf("ret i32 %%.%d\n",incrementa-1);
+                if(tipo_func == 2){
+                    printf("%%.%d = sitofp i32 %%.%d to double\n",incrementa, incrementa-1);
+                    incrementa++;
+                    printf("ret double %%.%d\n",incrementa-1);
+                }else{
+                    printf("ret i32 %%.%d\n",incrementa-1);
+                }
             }
             else if(strcmp(aux->childs[0]->annotation, "double") == 0){
                 printf("ret double %%.%d\n",incrementa-1);
@@ -693,8 +721,6 @@ void create_expressions(struct node *node, table_element *table){
         int x1 = incrementa;
         create_expressions(aux->childs[1], table);
         int x2 = incrementa;
-        //printf("1: %s\n",aux->childs[0]->annotation);
-        //printf("2: %s\n",aux->childs[1]->annotation);
         if(strcmp(aux->childs[0]->annotation, "int") == 0 && strcmp(aux->childs[1]->annotation, "double") == 0){
             printf("%%.%d = sitofp i32 %%.%d to double\n",incrementa, x1-1);
             incrementa++;
@@ -856,7 +882,27 @@ void create_expressions(struct node *node, table_element *table){
         int x1 = incrementa;
         create_expressions(aux->childs[1], table);
         int x2 = incrementa;
-        if(strcmp(aux->childs[0]->annotation, "int") == 0 && strcmp(aux->childs[1]->annotation, "double") == 0){
+        if(strcmp(aux->childs[0]->type, "DecLit") == 0 && strcmp(aux->childs[1]->type, "DecLit") == 0){
+            printf("%%.%d = shl i32 %%.%d, %%.%d\n",incrementa, x1-1 , x2-1);
+            incrementa++;
+        }
+        else if(strcmp(aux->childs[0]->type, "RealLit") == 0 && strcmp(aux->childs[1]->type, "RealLit") == 0){
+            printf("%%.%d = shl double %%.%d, %%.%d\n",incrementa, x1-1 , x2-1);
+            incrementa++;
+        }
+        else if(strcmp(aux->childs[0]->type, "DecLit") == 0 && strcmp(aux->childs[1]->type, "RealLit") == 0){
+            printf("%%.%d = sitofp i32 %%.%d to double\n",incrementa, x1-1);
+            incrementa++;
+            printf("%%.%d = shl double %%.%d, %%.%d\n",incrementa, incrementa-1 , x2-1);
+            incrementa++;
+        }
+        else if(strcmp(aux->childs[0]->type, "RealLit") == 0 && strcmp(aux->childs[1]->type, "DecLit") == 0){
+            printf("%%.%d = sitofp i32 %%.%d to double\n",incrementa, x2-1);
+            incrementa++;
+            printf("%%.%d = shl double %%.%d, %%.%d\n",incrementa, x1-1 , incrementa-1);
+            incrementa++;
+        }
+        else if(strcmp(aux->childs[0]->annotation, "int") == 0 && strcmp(aux->childs[1]->annotation, "double") == 0){
             printf("%%.%d = sitofp i32 %%.%d to double\n",incrementa, x1-1);
             incrementa++;
             printf("%%.%d = shl double %%.%d, %%.%d\n",incrementa, incrementa-1 , x2-1);
@@ -882,7 +928,27 @@ void create_expressions(struct node *node, table_element *table){
         int x1 = incrementa;
         create_expressions(aux->childs[1], table);
         int x2 = incrementa;
-        if(strcmp(aux->childs[0]->annotation, "int") == 0 && strcmp(aux->childs[1]->annotation, "double") == 0){
+        if(strcmp(aux->childs[0]->type, "DecLit") == 0 && strcmp(aux->childs[1]->type, "DecLit") == 0){
+            printf("%%.%d = lshr i32 %%.%d, %%.%d\n",incrementa, x1-1 , x2-1);
+            incrementa++;
+        }
+        else if(strcmp(aux->childs[0]->type, "RealLit") == 0 && strcmp(aux->childs[1]->type, "RealLit") == 0){
+           printf("%%.%d = lshr double %%.%d, %%.%d\n",incrementa, x1-1 , x2-1);
+            incrementa++;
+        }
+        else if(strcmp(aux->childs[0]->type, "DecLit") == 0 && strcmp(aux->childs[1]->type, "RealLit") == 0){
+            printf("%%.%d = sitofp i32 %%.%d to double\n",incrementa, x1-1);
+            incrementa++;
+            printf("%%.%d = lshr double %%.%d, %%.%d\n",incrementa, incrementa-1 , x2-1);
+            incrementa++;
+        }
+        else if(strcmp(aux->childs[0]->type, "RealLit") == 0 && strcmp(aux->childs[1]->type, "DecLit") == 0){
+            printf("%%.%d = sitofp i32 %%.%d to double\n",incrementa, x2-1);
+            incrementa++;
+            printf("%%.%d = lshr double %%.%d, %%.%d\n",incrementa, x1-1 , incrementa-1);
+            incrementa++;
+        }
+        else if(strcmp(aux->childs[0]->annotation, "int") == 0 && strcmp(aux->childs[1]->annotation, "double") == 0){
             printf("%%.%d = sitofp i32 %%.%d to double\n",incrementa, x1-1);
             incrementa++;
             printf("%%.%d = lshr double %%.%d, %%.%d\n",incrementa, incrementa-1 , x2-1);
@@ -905,9 +971,7 @@ void create_expressions(struct node *node, table_element *table){
     }
     else if(strcmp(aux->type, "Eq") == 0){//2filhos
         create_expressions(aux->childs[0], table);
-          //      printf("FAZE ESTE\n");
         int x1 = incrementa;
-        //printf("FAZE ESTE\n");
         create_expressions(aux->childs[1], table);
         int x2 = incrementa;
         if(strcmp(aux->childs[0]->annotation, "int") == 0 && strcmp(aux->childs[1]->annotation, "double") == 0){
@@ -928,6 +992,10 @@ void create_expressions(struct node *node, table_element *table){
         }
         else if(strcmp(aux->childs[0]->annotation, "int") == 0 && strcmp(aux->childs[1]->annotation, "int") == 0){
             printf("%%.%d = icmp eq i32 %%.%d, %%.%d\n",incrementa, x1-1 , x2-1);
+            incrementa++;
+        }
+         else if(strcmp(aux->childs[0]->annotation, "boolean") == 0 && strcmp(aux->childs[1]->annotation, "boolean") == 0){
+            printf("%%.%d = icmp eq i1 %%.%d, %%.%d\n",incrementa, x1-1 , x2-1);
             incrementa++;
         }
     }
@@ -1060,15 +1128,19 @@ void create_expressions(struct node *node, table_element *table){
             printf("%%.%d = icmp ne i32 %%.%d, %%.%d\n",incrementa, x1-1 , x2-1);
             incrementa++;
         }
+        else if(strcmp(aux->childs[0]->annotation, "boolean") == 0 && strcmp(aux->childs[1]->annotation, "boolean") == 0){
+            printf("%%.%d = icmp ne i1 %%.%d, %%.%d\n",incrementa, x1-1 , x2-1);
+            incrementa++;
+        }
     }
     else if(strcmp(aux->type, "Not") == 0){//1filho
-    /*
-    <result> = xor i32 %V, -1          ; yields i32:result = ~%V
-    */
-    create_expressions(aux->childs[0], table);
-    int x1 = incrementa;
-    printf("%%.%d = xor i32 %%.%d, -1\n", incrementa, x1-1);
-    incrementa++;
+        /*
+        <result> = xor i32 %V, -1          ; yields i32:result = ~%V
+        */
+        create_expressions(aux->childs[0], table);
+        int x1 = incrementa;
+        printf("%%.%d = xor i1 %%.%d, true\n", incrementa, x1-1);
+        incrementa++;
     }
     else if(strcmp(aux->type, "Minus") == 0){//1filho
         /*
@@ -1086,9 +1158,6 @@ void create_expressions(struct node *node, table_element *table){
         }
     }
     else if(strcmp(aux->type, "Plus") == 0){//1filho
-        /*
-        <result> = add i32 0, %val          ; yields i32:result = +%var
-        */
         create_expressions(aux->childs[0], table);
         int x1 = incrementa;
         if(strcmp(aux->childs[0]->annotation, "int") == 0){
@@ -1103,8 +1172,12 @@ void create_expressions(struct node *node, table_element *table){
 
     }
     else if(strcmp(aux->type, "Length") == 0){//1filho
-        create_expressions(aux->childs[0], table);
+        //create_expressions(aux->childs[0], table);
         //int x1 = incrementa;
+        printf("%%.%d = load i32, i32* %%size.\n",incrementa);
+        incrementa++;
+        printf("%%.%d = sub i32 %%.%d, 1\n",incrementa, incrementa-1);
+        incrementa++;
     }
     else if(strcmp(aux->type, "Id") == 0){//no so
         /*%.4 = load i32, i32* %i
@@ -1128,7 +1201,7 @@ void create_expressions(struct node *node, table_element *table){
             }
             incrementa++;
         }
-        if(strcmp(aux->annotation, "boolean") == 0){
+        else if(strcmp(aux->annotation, "boolean") == 0){
             if(!verifica_local(aux, table) && verifica_global(aux)){
                 printf("%%.%d = load i1 , i1* @%s_bool\n",incrementa, aux->value);
             }
@@ -1137,7 +1210,16 @@ void create_expressions(struct node *node, table_element *table){
             }
             incrementa++;
         }
-    }
+        else if(strcmp(aux->annotation, "String[]") == 0){
+            if(!verifica_local(aux, table) && verifica_global(aux)){
+                printf("%%.%d = load i8** , i8*** @%s_bool\n",incrementa, aux->value);
+            }
+            else{
+                printf("%%.%d = load i8** , i8*** %%%s\n",incrementa, aux->value);
+            }
+            incrementa++;
+        }
+    }    
     else if(strcmp(aux->type, "DecLit") == 0){//no so
         // %.5 = add i32 0, 1, pode ser tambem 2_2 = 22
         int x = strlen(aux->value);
@@ -1199,7 +1281,7 @@ void create_expressions(struct node *node, table_element *table){
     }
     else if(strcmp(aux->type, "BoolLit") == 0){//no so
         //%.1 = or i1 false, true
-        printf("%%.%d = or i1 false, true\n",incrementa);
+        printf("%%.%d = or i1 false, %s\n",incrementa, aux->value);
         incrementa++;
     }
     else if(strcmp(aux->type, "Call") == 0){//no so

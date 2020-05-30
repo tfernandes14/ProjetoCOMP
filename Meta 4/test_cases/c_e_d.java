@@ -11,7 +11,7 @@ class CeD{
 		System.out.print("\n");
 		System.out.print(d);
 		System.out.print("\n");
-		System.out.print("Teste\tde \fstring\\\"\r%%");
+		System.out.print("Teste\tde \fstring\\\"%%");
 		System.out.print("\n");
 		System.out.print( (a = a +1) >0 || (a = a +3) >0);
 		System.out.print("\n");

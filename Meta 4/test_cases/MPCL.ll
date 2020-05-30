@@ -5,8 +5,9 @@ declare i32 @atoi(i8*)
 @.str.int = constant [3 x i8] c"%d\00"
 @.str.double = constant [6 x i8] c"%.16e\00"
 @.str.0 = constant [2 x i8] c"\0A\00"
-define i32 @main(i32,i8** %.args) {
-%args = alloca i8**
+define i32 @main(i32 %.size.,i8** %.args) {
+%size. = alloca i32
+store i32 %.size., i32* %size.%args = alloca i8**
 store i8** %.args, i8*** %args
 %arg1 = alloca i32
 %.1 = add i32 0, 0

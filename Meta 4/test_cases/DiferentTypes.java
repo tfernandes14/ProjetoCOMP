@@ -24,6 +24,7 @@ class Main {
     public static double real(){
         double i;
         i=1.0;
+        i = i + 2.0;
         System.out.print(i);
         System.out.print("\n");
         return i;

@@ -1735,8 +1735,8 @@ yyreduce:
   case 15:
 #line 146 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                            struct node *methodheader = create_node("MethodHeader", "", 0, 0);
-                                                            struct node *parametros = create_node("MethodParams","", 0, 0);
+                                                            struct node *methodheader = create_node("MethodHeader", "", (yylsp[-4]).first_line, (yylsp[-4]).first_column);
+                                                            struct node *parametros = create_node("MethodParams","", (yylsp[-3]).first_line, (yylsp[-3]).first_column);
                                                             struct node *idd = create_node("Id", (yyvsp[-3].str), (yylsp[-3]).first_line, (yylsp[-3]).first_column);
                                                             add_child(methodheader, (yyvsp[-4].node));
                                                             add_child(methodheader, idd);
@@ -1752,9 +1752,9 @@ yyreduce:
   case 16:
 #line 158 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                            struct node *methodheader = create_node("MethodHeader", "", 0, 0);
-                                                            struct node *parametros = create_node("MethodParams","", 0, 0);
-                                                            struct node *voidy = create_node("Void", "", 0, 0);
+                                                            struct node *methodheader = create_node("MethodHeader", "", (yylsp[-4]).first_line, (yylsp[-4]).first_column);
+                                                            struct node *parametros = create_node("MethodParams","", (yylsp[-3]).first_line, (yylsp[-3]).first_column);
+                                                            struct node *voidy = create_node("Void", "", (yylsp[-4]).first_line, (yylsp[-4]).first_column);
                                                             struct node *idd = create_node("Id", (yyvsp[-3].str), (yylsp[-3]).first_line, (yylsp[-3]).first_column);
                                                             add_child(methodheader, voidy);
                                                             add_child(methodheader, idd);
@@ -1784,7 +1784,7 @@ yyreduce:
   case 19:
 #line 179 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                struct node *paramsDecl = create_node("ParamDecl","", 0, 0);
+                                                struct node *paramsDecl = create_node("ParamDecl","", (yylsp[-2]).first_line, (yylsp[-2]).first_column);
                                                 struct node *idd = create_node("Id", (yyvsp[-1].str), (yylsp[-1]).first_line, (yylsp[-1]).first_column);
                                                 add_child(paramsDecl, (yyvsp[-2].node));
                                                 add_child(paramsDecl, idd);
@@ -1800,8 +1800,8 @@ yyreduce:
   case 20:
 #line 190 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                struct node *paramsDecl = create_node("ParamDecl", "", 0, 0);
-                                                struct node *string = create_node("StringArray", "", 0, 0);
+                                                struct node *paramsDecl = create_node("ParamDecl", "", (yylsp[-3]).first_line, (yylsp[-3]).first_column);
+                                                struct node *string = create_node("StringArray", "", (yylsp[-3]).first_line, (yylsp[-3]).first_column);
                                                 struct node *idd = create_node("Id",(yyvsp[0].str), (yylsp[0]).first_line, (yylsp[0]).first_column);
                                                 add_child(paramsDecl, string);
                                                 add_child(paramsDecl, idd);
@@ -1814,7 +1814,7 @@ yyreduce:
   case 21:
 #line 201 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                            struct node *paramdecl = create_node("ParamDecl", "", 0, 0);
+                                                            struct node *paramdecl = create_node("ParamDecl", "", (yylsp[-2]).first_line, (yylsp[-2]).first_column);
                                                             struct node *idd = create_node("Id", (yyvsp[-1].str), (yylsp[-1]).first_line, (yylsp[-1]).first_column);
                                                             add_child(paramdecl, (yyvsp[-2].node));
                                                             add_child(paramdecl, idd);
@@ -1837,7 +1837,7 @@ yyreduce:
   case 23:
 #line 216 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                struct node *methodbody = create_node("MethodBody", "", 0, 0);
+                                                struct node *methodbody = create_node("MethodBody", "", (yylsp[-2]).first_line, (yylsp[-2]).first_column);
                                                 if ((yyvsp[-1].node) != NULL){
                                                     add_child(methodbody, (yyvsp[-1].node));
                                                 }
@@ -1886,7 +1886,7 @@ yyreduce:
   case 27:
 #line 249 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                struct node *vardecl = create_node("VarDecl", "", 0, 0);
+                                                struct node *vardecl = create_node("VarDecl", "", (yylsp[-3]).first_line, (yylsp[-3]).first_column);
                                                 struct node *idd = create_node("Id", (yyvsp[-2].str), (yylsp[-2]).first_line, (yylsp[-2]).first_column);
                                                 add_child(vardecl, (yyvsp[-3].node));
                                                 add_child(vardecl, idd);
@@ -1902,7 +1902,7 @@ yyreduce:
   case 28:
 #line 262 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                        struct node *vardecl = create_node("VarDecl", "", 0, 0);
+                                                        struct node *vardecl = create_node("VarDecl", "", (yylsp[-1]).first_line, (yylsp[-1]).first_column);
                                                         struct node *idd = create_node("Id", (yyvsp[-1].str), (yylsp[-1]).first_line, (yylsp[-1]).first_column);
                                                         struct node *ty = create_node(tipo,"", 0, 0);
                                                         add_child(vardecl, ty);
@@ -1926,7 +1926,7 @@ yyreduce:
 #line 277 "jucompiler.y" /* yacc.c:1646  */
     {
                                                             if ((yyvsp[-1].node) != NULL && (yyvsp[-1].node)->bros != NULL){
-                                                                struct node *block = create_node("Block", "", 0, 0);
+                                                                struct node *block = create_node("Block", "", (yylsp[-1]).first_line, (yylsp[-1]).first_column);
                                                                 add_child(block, (yyvsp[-1].node));
                                                                 (yyval.node) = block;
                                                             }
@@ -1940,11 +1940,11 @@ yyreduce:
   case 31:
 #line 287 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                            struct node *if1 = create_node("If","", 0, 0);
+                                                            struct node *if1 = create_node("If","", (yylsp[-4]).first_line, (yylsp[-4]).first_column);
                                                             add_child(if1, (yyvsp[-2].node));
                                                             if((yyvsp[0].node) != NULL){
                                                                 add_child(if1, (yyvsp[0].node));
-                                                                struct node *block = create_node("Block", "", 0, 0);
+                                                                struct node *block = create_node("Block", "", (yylsp[0]).first_line, (yylsp[0]).first_column);
                                                                 add_child(if1, block);
                                                                 add_bro((yyvsp[-2].node), (yyvsp[0].node));
                                                                 add_bro((yyvsp[0].node), block);
@@ -1966,7 +1966,7 @@ yyreduce:
   case 32:
 #line 308 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                            struct node *if2 = create_node("If", "", 0, 0);
+                                                            struct node *if2 = create_node("If", "", (yylsp[-6]).first_line, (yylsp[-6]).first_column);
                                                             add_child(if2, (yyvsp[-4].node));
                                                             if((yyvsp[-2].node) != NULL){
                                                                 add_child(if2, (yyvsp[-2].node));
@@ -1976,13 +1976,13 @@ yyreduce:
                                                                     add_bro((yyvsp[-2].node), (yyvsp[0].node));
                                                                     (yyval.node) = if2;
                                                                 }else{
-                                                                    struct node *block2 = create_node("Block", "", 0, 0);
+                                                                    struct node *block2 = create_node("Block", "", (yylsp[0]).first_line, (yylsp[0]).first_column);
                                                                     add_child(if2, block2);
                                                                     add_bro((yyvsp[-2].node), block2);
                                                                     (yyval.node) = if2;
                                                                 }
                                                             }else{
-                                                                struct node *block = create_node("Block", "", 0, 0);
+                                                                struct node *block = create_node("Block", "", (yylsp[-2]).first_line, (yylsp[-2]).first_column);
                                                                 add_child(if2, block);
                                                                 add_bro((yyvsp[-4].node), block);
                                                                 if((yyvsp[0].node) != NULL){
@@ -1990,7 +1990,7 @@ yyreduce:
                                                                     add_bro(block, (yyvsp[0].node));
                                                                     (yyval.node) = if2;
                                                                 }else{
-                                                                    struct node *block2 = create_node("Block", "", 0, 0);
+                                                                    struct node *block2 = create_node("Block", "", (yylsp[0]).first_line, (yylsp[0]).first_column);
                                                                     add_child(if2, block2);
                                                                     add_bro(block, block2);
                                                                     (yyval.node) = if2;
@@ -2003,7 +2003,7 @@ yyreduce:
   case 33:
 #line 340 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                            struct node *whi = create_node("While", "", 0, 0);
+                                                            struct node *whi = create_node("While", "", (yylsp[-4]).first_line, (yylsp[-4]).first_column);
                                                             add_child(whi, (yyvsp[-2].node));
                                                             if((yyvsp[0].node) != NULL){
                                                                 add_child(whi, (yyvsp[0].node));
@@ -2011,7 +2011,7 @@ yyreduce:
                                                                 (yyval.node) = whi;
                                                             }
                                                             else{
-                                                                struct node *block = create_node("Block", "", 0, 0);
+                                                                struct node *block = create_node("Block", "", (yylsp[0]).first_line, (yylsp[0]).first_column);
                                                                 add_child(whi, block);
                                                                 add_bro((yyvsp[-2].node), block);
                                                                 (yyval.node) = whi;
@@ -2023,7 +2023,7 @@ yyreduce:
   case 34:
 #line 355 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                            struct node *ret = create_node("Return","", 0, 0);
+                                                            struct node *ret = create_node("Return","", (yylsp[-2]).first_line, (yylsp[-2]).first_column);
                                                             add_child(ret,(yyvsp[-1].node));
                                                             (yyval.node) = ret;
                                                         }
@@ -2041,7 +2041,7 @@ yyreduce:
   case 36:
 #line 363 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                            struct node *pri = create_node("Print","", 0, 0);
+                                                            struct node *pri = create_node("Print","", (yylsp[-4]).first_line, (yylsp[-4]).first_column);
                                                             add_child(pri, (yyvsp[-2].node));
                                                             (yyval.node) = pri;
                                                         }
@@ -2133,7 +2133,7 @@ yyreduce:
   case 48:
 #line 405 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                                struct node *call = create_node("Call", "", 0, 0);
+                                                                struct node *call = create_node("Call", "", (yylsp[-3]).first_line, (yylsp[-3]).first_column);
                                                                 struct node *idd = create_node("Id", (yyvsp[-3].str), (yylsp[-3]).first_line, (yylsp[-3]).first_column);
                                                                 add_child(call, idd);
                                                                 add_child(call, (yyvsp[-1].node));
@@ -2186,7 +2186,7 @@ yyreduce:
   case 54:
 #line 434 "jucompiler.y" /* yacc.c:1646  */
     {
-                                    struct node *assign = create_node("Assign", "", 0, 0);
+                                    struct node *assign = create_node("Assign", "", (yylsp[-1]).first_line, (yylsp[-1]).first_column);
                                     struct node *idd = create_node("Id", (yyvsp[-2].str), (yylsp[-2]).first_line, (yylsp[-2]).first_column);
                                     add_child(assign, idd);
                                     add_child(assign, (yyvsp[0].node));
@@ -2199,7 +2199,7 @@ yyreduce:
   case 55:
 #line 444 "jucompiler.y" /* yacc.c:1646  */
     {
-                                                        struct node *parseargs = create_node("ParseArgs","", 0, 0);
+                                                        struct node *parseargs = create_node("ParseArgs","", (yylsp[-6]).first_line, (yylsp[-6]).first_column);
                                                         struct node *id = create_node("Id",(yyvsp[-4].str), (yylsp[-4]).first_line, (yylsp[-4]).first_column);
                                                         add_child(parseargs,id);
                                                         add_child(parseargs,(yyvsp[-2].node));
@@ -2776,12 +2776,13 @@ int main(int argc, char **argv){
         }
 
         else if (strcmp(argv[1], "-s") == 0){
-            // Analise semantica - Symbol table e AST
+            // Analise semantica - META 3
             return_flag = 1;
             yyparse();
             create_symbol_table(head);
-            show_table();
+            imprime_erros();
             create_ast(head, global_table, 0);
+            show_table();
             print_tree_annotated(head, 0);
         }
 

@@ -7,7 +7,7 @@ declare i32 @atoi(i8*)
 @.str.0 = constant [2 x i8] c"\0A\00"
 @.str.1 = constant [2 x i8] c"\0A\00"
 @.str.2 = constant [2 x i8] c"\0A\00"
-@.str.3 = constant [24 x i8] c"Teste\09de \0Cstring\5C\22\0D%%%%\00"
+@.str.3 = constant [23 x i8] c"Teste\09de \0Cstring\5C\22%%%%\00"
 @.str.4 = constant [2 x i8] c"\0A\00"
 @.str.5 = constant [2 x i8] c"\0A\00"
 @.str.6 = constant [2 x i8] c"\0A\00"
@@ -20,8 +20,9 @@ declare i32 @atoi(i8*)
 @b_int = common global i32 0
 @c_int = common global i32 0
 @d_int = common global i32 0
-define void @main(i32,i8** %.args) {
-%args = alloca i8**
+define void @main.entry(i32 %.size.,i8** %.args) {
+%size. = alloca i32
+store i32 %.size., i32* %size.%args = alloca i8**
 store i8** %.args, i8*** %args
 %.1 = add i32 0, 2
 store i32 %.1, i32* @a_int
@@ -46,7 +47,7 @@ store double %.8, double* %d
 %.12 = load double , double* %d
 %.13 = call i32 (i8*, ...) @printf(i8* getelementptr ([6 x i8], [6 x i8]* @.str.double, i32 0, i32 0), double %.12)
 %.14 = call i32 (i8*, ...) @printf(i8* getelementptr ([2 x i8], [2 x i8]* @.str.2, i32 0, i32 0))
-%.15 = call i32 (i8*, ...) @printf(i8* getelementptr ([24 x i8], [24 x i8]* @.str.3, i32 0, i32 0))
+%.15 = call i32 (i8*, ...) @printf(i8* getelementptr ([23 x i8], [23 x i8]* @.str.3, i32 0, i32 0))
 %.16 = call i32 (i8*, ...) @printf(i8* getelementptr ([2 x i8], [2 x i8]* @.str.4, i32 0, i32 0))
 %.17 = load i32 , i32* %a
 %.18 = add i32 0, 1
@@ -113,5 +114,9 @@ store double %.59, double* %d
 %.60 = load double , double* %d
 %.61 = call i32 (i8*, ...) @printf(i8* getelementptr ([6 x i8], [6 x i8]* @.str.double, i32 0, i32 0), double %.60)
 %.62 = call i32 (i8*, ...) @printf(i8* getelementptr ([2 x i8], [2 x i8]* @.str.11, i32 0, i32 0))
-ret void 
+ret void
+}
+define i32 @main(i32 %.size,i8** %.args){
+call void @main.entry(i32 %.size, i8** %.args)
+ret i32 0
 }

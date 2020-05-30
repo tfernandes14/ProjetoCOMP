@@ -789,7 +789,7 @@ char *yytext;
     */  
     #include <string.h>
     #include "y.tab.h"
-    #define LOCATION yylloc.first_line = yylloc.last_line = yylineno, yylloc.first_column = yycolumn, yylloc.last_column = yycolumn + yyleng - 1, yycolumn += yyleng;
+    #define LOCATION yylloc.first_line = yylloc.last_line = yylineno, yylloc.first_column = num_colunas - yyleng, yylloc.last_column = num_colunas + strlen(yytext) - 1, yycolumn += yyleng;
    
     int imprime, erros, return_flag; // Definidas no jucompiler.y
     int num_linhas = 1;
